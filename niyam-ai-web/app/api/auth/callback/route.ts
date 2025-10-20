@@ -17,7 +17,7 @@ export async function GET(request: Request) {
       client_id: process.env.ATLASSIAN_CLIENT_ID,
       client_secret: process.env.ATLASSIAN_CLIENT_SECRET,
       code,
-      redirect_uri: "https://riyabhandari.netlify.app/api/auth/callback",
+      redirect_uri: "https://niyam-ai-web.vercel.app/api/auth/callback",
     }),
   });
 
