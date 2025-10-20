@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
 export default function Home() {
   const handleConnect = () => {
-    const clientId = "auzfos4mGzu0ryPQzwW0hQw1SBJuAH2M";
+    const clientId = process.env.NEXT_PUBLIC_ATLASSIAN_CLIENT_ID;
     const redirectUri = "https://niyam-ai-web.vercel.app/api/auth/callback";
     const state = crypto.randomUUID();
 
@@ -15,8 +15,9 @@ export default function Home() {
 
   return (
     <div className="flex items-center justify-center min-h-screen">
-      <button className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-      onClick={handleConnect}
+      <button
+        className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
+        onClick={handleConnect}
       >
         Connect to JIRA
       </button>

@@ -14,8 +14,8 @@ export async function GET(request: Request) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       grant_type: "authorization_code",
-      client_id: process.env.ATLASSIAN_CLIENT_ID,
-      client_secret: process.env.ATLASSIAN_CLIENT_SECRET,
+      client_id: process.env.NEXT_PUBLIC_ATLASSIAN_CLIENT_ID,
+      client_secret: process.env.NEXT_PUBLIC_ATLASSIAN_CLIENT_SECRET,
       code,
       redirect_uri: "https://niyam-ai-web.vercel.app/api/auth/callback",
     }),
