@@ -1,3 +1,5 @@
+'use client';
+
 export default function Home() {
   const handleConnect = () => {
     const clientId = "auzfos4mGzu0ryPQzwW0hQw1SBJuAH2M";
