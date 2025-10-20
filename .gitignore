@@ -1,62 +1,105 @@
-# ========================
-# Build / Output folders
-# ========================
-dist/
+# =====================================================
+# BUILD / OUTPUT FOLDERS
+# =====================================================
 build/
-out/
+cache/
 coverage/
-target/           # Java build (Maven/Gradle)
-bin/              # Java or compiled binaries
+dist/
+out/
+target/                  # Java build (Maven/Gradle)
+bin/                     # Java or compiled binaries
+storybook-static/
 
-# ========================
-# Environment & Secrets
-# ========================
-.env
-.env.*
-.venv
-*.pem
-*.key
-*.crt
-*.p12
-service-account.json     # Google AI / BigQuery credentials
-
-# ========================
-# Logs & Runtime data
-# ========================
-logs/
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-*.pid
-*.seed
-*.pid.lock
-
-# ========================
-# Dependency directories
-# ========================
+# =====================================================
+# DEPENDENCY DIRECTORIES
+# =====================================================
 node_modules/
 bower_components/
 jspm_packages/
 .pnp/
 .pnp.js
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# =====================================================
+# ENVIRONMENT & SECRETS
+# =====================================================
+.env
+.env.*
+.venv
+venv/
+env/
+*.pem
+*.key
+*.crt
+*.p12
+service-account.json      # Google AI / BigQuery credentials
+
+# =====================================================
+# LOGS & RUNTIME DATA
+# =====================================================
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.pid
+*.seed
+*.pid.lock
+
+# =====================================================
+# DATABASES / DATA DUMPS
+# =====================================================
+*.bq                     # BigQuery temp files
+*.bson
+*.db
+*.lock-shm
+*.lock-wal
+*.sqlite
+*.sql
+dump.rdb
+
+# =====================================================
+# TESTING / COVERAGE
+# =====================================================
+.cypress/
+.nyc_output/
+coverage/
+playwright-report/
+test-output/
+
+# =====================================================
+# FRAMEWORK / TOOL SPECIFIC
+# =====================================================
+.next/
+.nuxt/
+.parcel-cache/
+.sass-cache/
+.vercel/
+.cache/
+
+# =====================================================
+# LANGUAGE SPECIFIC
+# =====================================================
 
 # Python
 __pycache__/
 *.py[cod]
+*.pyo
+*.pyd
 *.so
 .eggs/
 .eggs-info/
 *.egg
 *.egg-info/
-*.pyo
-*.pyd
 .Python
 pip-wheel-metadata/
 poetry.lock
 poetry.toml
-venv/
-env/
 
 # Java
 *.class
@@ -64,30 +107,13 @@ env/
 *.war
 *.ear
 
-# ========================
-# Databases / Data dumps
-# ========================
-*.sqlite
-*.db
-*.sql
-*.bq   # BigQuery temp files
-dump.rdb
-*.bson
-*.lock-wal
-*.lock-shm
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
 
-# ========================
-# Testing / Coverage
-# ========================
-coverage/
-.nyc_output/
-.cypress/
-playwright-report/
-test-output/
-
-# ========================
-# IDE & Editor settings
-# ========================
+# =====================================================
+# IDE & EDITOR SETTINGS
+# =====================================================
 .vscode/
 .idea/
 *.iml
@@ -98,24 +124,18 @@ test-output/
 *.sw?
 *~
 
-# ========================
-# OS files
-# ========================
+# =====================================================
+# OS FILES
+# =====================================================
 .DS_Store
 Thumbs.db
 ehthumbs.db
 Icon?
 Desktop.ini
 
-# ========================
-# Misc / Others
-# ========================
+# =====================================================
+# MISC / OTHERS
+# =====================================================
 package-lock.json
 yarn.lock
 pnpm-lock.yaml
-.parcel-cache/
-.next/
-.nuxt/
-.cache/
-.sass-cache/
-storybook-static/
