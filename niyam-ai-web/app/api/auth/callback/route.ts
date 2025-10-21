@@ -56,5 +56,5 @@ export async function GET(request: Request) {
   console.log("Cloud ID:", cloudId);
 
   // Step 4: Redirect user or show success
-  return NextResponse.redirect("/");
+  return NextResponse.redirect("https://niyam-ai-web.vercel.app/");
 }
