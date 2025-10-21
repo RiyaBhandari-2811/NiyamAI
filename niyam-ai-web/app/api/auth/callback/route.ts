@@ -1,16 +1,16 @@
+import { db } from "@/app/config/firebaseAdmin";
 import { NextResponse } from "next/server";
+import {jwtDecode} from "jwt-decode";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const code = searchParams.get("code");
 
-  console.log("Inside api function");
-
   if (!code) {
     return NextResponse.json({ error: "Missing code" }, { status: 400 });
   }
 
-  // Step 1: Exchange code for access token
+  // Step 1: Exchange code for access & refresh token
   const tokenResponse = await fetch("https://auth.atlassian.com/oauth/token", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -24,21 +24,19 @@ export async function GET(request: Request) {
   });
 
   const tokenData = await tokenResponse.json();
-  console.log("Token Data: ", tokenData);
-  const accessToken = tokenData.access_token;
 
-  if (!accessToken) {
+  if (!tokenData.access_token || !tokenData.refresh_token) {
     return NextResponse.json(
       { error: "Token exchange failed", details: tokenData },
       { status: 400 }
     );
   }
 
-  // Step 2: Fetch Cloud ID using the access token (this is where that code goes)
+  // Step 2: Fetch Cloud ID
   const res = await fetch(
     "https://api.atlassian.com/oauth/token/accessible-resources",
     {
-      headers: { Authorization: `Bearer ${accessToken}` },
+      headers: { Authorization: `Bearer ${tokenData.access_token}` },
     }
   );
 
@@ -52,10 +50,31 @@ export async function GET(request: Request) {
     );
   }
 
-  // Step 3: (Optional) Store accessToken + cloudId in your DB/session
-  console.log("Access Token:", accessToken);
-  console.log("Cloud ID:", cloudId);
+  // Step 3: Store in Firestore (encrypt sensitive tokens)
+    const decoded = jwtDecode<{ "https://auth.atlassian.com/systemAccountId"?: string }>(tokenData.access_token);
+    const systemAccountId = decoded["https://auth.atlassian.com/systemAccountId"];
+    console.log("Jira systemAccountId:", systemAccountId);
+  
+    if (!systemAccountId) {
+      return NextResponse.json(
+        { error: "systemAccountId not found in token", decoded },
+        { status: 400 }
+      );
+    }
+  
+    await db
+      .collection("users")
+      .doc(systemAccountId)
+      .set(
+        {
+          accessToken: tokenData.access_token,
+          refreshToken: tokenData.refresh_token,
+          cloudId,
+          expiresAt: Date.now() + tokenData.expires_in * 1000, // for access token expiry
+          scope: tokenData.scope,
+        },
+        { merge: true }
+      );
 
-  // Step 4: Redirect user or show success
   return NextResponse.redirect("https://niyam-ai-web.vercel.app/");
 }
