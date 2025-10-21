@@ -1,6 +1,6 @@
 import { db } from "@/app/config/firebaseAdmin";
 import { NextResponse } from "next/server";
-import {jwtDecode} from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -51,30 +51,32 @@ export async function GET(request: Request) {
   }
 
   // Step 3: Store in Firestore (encrypt sensitive tokens)
-    const decoded = jwtDecode<{ "https://auth.atlassian.com/systemAccountId"?: string }>(tokenData.access_token);
-    const systemAccountId = decoded["https://auth.atlassian.com/systemAccountId"];
-    console.log("Jira systemAccountId:", systemAccountId);
-  
-    if (!systemAccountId) {
-      return NextResponse.json(
-        { error: "systemAccountId not found in token", decoded },
-        { status: 400 }
-      );
-    }
-  
-    await db
-      .collection("users")
-      .doc(systemAccountId)
-      .set(
-        {
-          accessToken: tokenData.access_token,
-          refreshToken: tokenData.refresh_token,
-          cloudId,
-          expiresAt: Date.now() + tokenData.expires_in * 1000, // for access token expiry
-          scope: tokenData.scope,
-        },
-        { merge: true }
-      );
+  const decoded = jwtDecode<{
+    "https://atlassian.com/systemAccountId"?: string;
+  }>(tokenData.access_token);
+  const systemAccountId = decoded["https://atlassian.com/systemAccountId"];
+  console.log("Jira systemAccountId:", systemAccountId);
+
+  if (!systemAccountId) {
+    return NextResponse.json(
+      { error: "systemAccountId not found in token", decoded },
+      { status: 400 }
+    );
+  }
+
+  await db
+    .collection("users")
+    .doc(systemAccountId)
+    .set(
+      {
+        accessToken: tokenData.access_token,
+        refreshToken: tokenData.refresh_token,
+        cloudId,
+        expiresAt: Date.now() + tokenData.expires_in * 1000, // for access token expiry
+        scope: tokenData.scope,
+      },
+      { merge: true }
+    );
 
   return NextResponse.redirect("https://niyam-ai-web.vercel.app/");
 }
