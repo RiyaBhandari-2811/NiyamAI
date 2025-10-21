@@ -24,6 +24,7 @@ export async function GET(request: Request) {
   });
 
   const tokenData = await tokenResponse.json();
+  console.log("Token Data: ", tokenData);
   const accessToken = tokenData.access_token;
 
   if (!accessToken) {
