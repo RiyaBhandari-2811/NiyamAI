@@ -5,8 +5,7 @@ export default function Home() {
     const clientId = process.env.NEXT_PUBLIC_ATLASSIAN_CLIENT_ID;
     const redirectUri = "https://niyam-ai-web.vercel.app/api/auth/callback";
     const state = crypto.randomUUID();
-
-    const jiraAuthUrl = `https://auth.atlassian.com/authorize?audience=api.atlassian.com&client_id=${clientId}&scope=read%3Ajira-work%20manage%3Ajira-project%20manage%3Ajira-configuration%20read%3Ajira-user%20write%3Ajira-work&redirect_uri=${encodeURIComponent(
+    const jiraAuthUrl = `https://auth.atlassian.com/authorize?audience=api.atlassian.com&client_id=${clientId}&scope=offline_access%20read%3Ajira-work%20manage%3Ajira-project%20manage%3Ajira-configuration%20read%3Ajira-user%20write%3Ajira-work&redirect_uri=${encodeURIComponent(
       redirectUri
     )}&state=${state}&response_type=code&prompt=consent`;
 
