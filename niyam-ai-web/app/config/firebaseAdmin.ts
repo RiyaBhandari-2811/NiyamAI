@@ -11,6 +11,7 @@ try {
         .replace(/\r/g, "")
         .trim(),
     },
+    databaseId: "niyam-ai-db",
   });
 
   console.log("[firebaseAdmin] Firestore initialized successfully");
