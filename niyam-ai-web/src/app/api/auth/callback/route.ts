@@ -1,10 +1,10 @@
-import { db } from "@/app/config/firebaseAdmin";
+import { db } from "@/src/config/firebaseAdmin";
 import { NextResponse } from "next/server";
-import { jwtDecode } from "jwt-decode";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const code = searchParams.get("code");
+  const state = searchParams.get("state");
 
   if (!code) {
     return NextResponse.json({ error: "Missing code" }, { status: 400 });
@@ -50,30 +50,20 @@ export async function GET(request: Request) {
     );
   }
 
-  // Step 3: Store in Firestore (encrypt sensitive tokens)
-  const decoded = jwtDecode<{
-    "https://atlassian.com/systemAccountId"?: string;
-  }>(tokenData.access_token);
-  const systemAccountId = decoded["https://atlassian.com/systemAccountId"];
-  console.log("Jira systemAccountId:", systemAccountId);
-
-  if (!systemAccountId) {
-    return NextResponse.json(
-      { error: "systemAccountId not found in token", decoded },
-      { status: 400 }
-    );
-  }
-
+  // Step 3: Store in Firestore 
   await db
     .collection("users")
-    .doc(systemAccountId)
+    .doc(state as string)
     .set(
       {
-        accessToken: tokenData.access_token,
-        refreshToken: tokenData.refresh_token,
-        cloudId,
-        expiresAt: Date.now() + tokenData.expires_in * 1000, // for access token expiry
-        scope: tokenData.scope,
+        jira: {
+          accessToken: tokenData.access_token,
+          refreshToken: tokenData.refresh_token,
+          cloudId,
+          expiresAt: Date.now() + tokenData.expires_in * 1000,
+          scope: tokenData.scope,
+          connected: true,
+        },
       },
       { merge: true }
     );
