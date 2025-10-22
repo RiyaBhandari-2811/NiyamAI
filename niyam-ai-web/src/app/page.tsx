@@ -8,10 +8,11 @@ export default function Home() {
 
   // Get userId from localStorage on client
   useEffect(() => {
-    let id = localStorage.getItem("userId");
-    if (id === null) {
+    let id = localStorage.getItem("userId");  
+    if(id === null){
       id = crypto.randomUUID();
     }
+    localStorage.setItem("userId", id);
     setUserId(id);
   }, []);
 
@@ -19,13 +20,13 @@ export default function Home() {
   useEffect(() => {
     if (!userId) return;
     fetch(`/api/auth/jira-status?userId=${userId}`)
-      .then((res) => res.json())
-      .then((data) => setConnected(data.connected))
+      .then(res => res.json())
+      .then(data => setConnected(data.connected))
       .catch(console.error);
   }, [userId]);
 
   const handleConnect = () => {
-    console.log(userId);
+     console.log(userId);
     if (!userId) return;
 
     const clientId = process.env.NEXT_PUBLIC_ATLASSIAN_CLIENT_ID;
