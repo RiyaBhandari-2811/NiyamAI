@@ -11,20 +11,32 @@ const EmptyState: React.FC = () => {
   const features = [
     {
       icon: ScrollText,
-      color: "green",
+      colorClasses: {
+        bg: "bg-green-500/10",
+        textIcon: "text-green-500",
+        textTitle: "text-green-400",
+      },
       title: "Upload PRD",
       description:
         "Share the Product Requirement Document for test-case generation",
     },
     {
       icon: Bot,
-      color: "blue",
+      colorClasses: {
+        bg: "bg-blue-500/10",
+        textIcon: "text-blue-500",
+        textTitle: "text-blue-400",
+      },
       title: "AI Review",
       description: "Agent analyzes PRD, and drafts scenarios",
     },
     {
       icon: CheckCircle,
-      color: "purple",
+      colorClasses: {
+        bg: "bg-purple-500/10",
+        textIcon: "text-purple-500",
+        textTitle: "text-purple-400",
+      },
       title: "Create Tasks",
       description:
         "Auto-generate and push test-case tasks into your Jira account",
@@ -38,9 +50,9 @@ const EmptyState: React.FC = () => {
         <div className="max-w-4xl w-full space-y-8">
           {/* Main header */}
           <div className="space-y-6 text-center">
-            <div className="flex items-center justify-center space-x-3 max-w-fit bg-slate-300 rounded-xl mx-auto backdrop-blur-lg  px-2 py-1 shadow-sm">
+            <div className="flex items-center justify-center space-x-3 max-w-fit font-bold bg-slate-300 rounded-xl mx-auto backdrop-blur-2xl px-2 py-1 shadow-sm">
               <Zap size={20} />
-              <p className="text-sm text-slate-900 m-0 p-0 font-semibold">
+              <p className="text-sm text-slate-950 m-0 p-0 font-semibold">
                 Your AI-Powered Healthcare Test Case Generator
               </p>
             </div>
@@ -49,22 +61,21 @@ const EmptyState: React.FC = () => {
               intelligent PRD analysis, automated reviews, and structured task
               creation to accelerate success.
             </p>
-            <p className="text-sm text-neutral-300 max-w-2xl mx-auto">
-              Powered by Google Gemini
-            </p>
           </div>
         </div>
 
         {/* Feature highlights */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-3xl mx-auto">
-          {features.map(({ icon: Icon, color, title, description }) => (
+          {features.map(({ icon: Icon, colorClasses, title, description }) => (
             <div key={title} className="space-y-3 text-center">
               <div
-                className={`w-12 h-12 bg-${color}-500/10 rounded-xl flex items-center justify-center mx-auto`}
+                className={`w-12 h-12 ${colorClasses.bg} rounded-xl flex items-center justify-center mx-auto`}
               >
-                <Icon className={`w-6 h-6 text-${color}-500`} />
+                <Icon className={`w-6 h-6 ${colorClasses.textIcon}`} />
               </div>
-              <h3 className={`font-semibold text-${color}-400`}>{title}</h3>
+              <h3 className={`font-semibold ${colorClasses.textTitle}`}>
+                {title}
+              </h3>
               <p className="text-sm text-neutral-400">{description}</p>
             </div>
           ))}
