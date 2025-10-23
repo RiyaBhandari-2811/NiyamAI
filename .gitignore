@@ -28,7 +28,8 @@ jspm_packages/
 # ENVIRONMENT & SECRETS
 # =====================================================
 .env
-.env.*
+.env.local
+.env.production
 .venv
 venv/
 env/
