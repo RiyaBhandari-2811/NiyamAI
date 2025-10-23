@@ -30,7 +30,6 @@ export async function fetchActiveSessionsAction(
     const result = await listUserSessions(userId);
 
     // Fetch session details with events for each session in parallel to get real message counts
-
     const sessionDetailsPromises = result.sessions.map(async (session) => {
       try {
         const sessionWithEvents = await getSessionWithEvents(

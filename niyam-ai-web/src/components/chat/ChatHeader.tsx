@@ -43,25 +43,14 @@ const ChatHeader = () => {
                 {userId}
               </Badge>
               <SessionSelector
-              currentUserId={userId}
-              currentSessionId={sessionId}
-              onSessionSelect={handleSessionSwitch}
-              onCreateSession={handleCreateNewSession}
-              className="text-xs"
-            />
+                currentUserId={userId}
+                currentSessionId={sessionId}
+                onSessionSelect={handleSessionSwitch}
+                onCreateSession={handleCreateNewSession}
+                className="text-xs"
+              />
             </>
           )}
-
-          {/* Session Management
-          {userId && connected && (
-            <SessionSelector
-              currentUserId={userId}
-              currentSessionId={sessionId}
-              onSessionSelect={handleSessionSwitch}
-              onCreateSession={handleCreateNewSession}
-              className="text-xs"
-            />
-          )} */}
 
           <JiraAuth />
         </div>

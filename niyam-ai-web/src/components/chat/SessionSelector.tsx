@@ -224,100 +224,91 @@ export function SessionSelector({
 
   return (
     <div className={`${className}`}>
-      {!currentUserId ? (
-        <div className="flex items-center gap-2 text-xs text-slate-400">
-          <MessageSquare className="w-4 h-4" />
-          <span>No user set</span>
-        </div>
-      ) : (
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-slate-400">Session:</span>
-          <Select value={currentSessionId} onValueChange={handleSessionSelect}>
-            <SelectTrigger className="w-44 h-12 text-xs bg-slate-700/50 border-slate-600/50 text-slate-100 hover:bg-slate-600/50 focus:border-emerald-500 px-4 py-1">
-              <SelectValue
-                placeholder={
-                  isLoadingSessions
-                    ? "Loading sessions..."
-                    : sessionError
-                    ? "Error loading sessions"
-                    : sessions.length === 0
-                    ? "Create your first session"
-                    : "Select session"
-                }
-              />
-            </SelectTrigger>
-            <SelectContent className="bg-slate-800 border-slate-600 min-w-44">
-              {/* Loading state */}
-              {isLoadingSessions && (
-                <div className="flex items-center gap-2 p-3 text-slate-400">
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  <span className="text-sm">Loading active sessions...</span>
-                </div>
-              )}
+      <div className="flex items-center gap-2">
+        <span className="text-sm text-slate-400">Session:</span>
+        <Select value={currentSessionId} onValueChange={handleSessionSelect}>
+          <SelectTrigger className="w-44 h-12 text-xs bg-slate-700/50 border-slate-600/50 text-slate-100 hover:bg-slate-600/50 focus:border-emerald-500 px-4 py-1">
+            <SelectValue
+              placeholder={
+                isLoadingSessions
+                  ? "Loading sessions..."
+                  : sessionError
+                  ? "Error loading sessions"
+                  : sessions.length === 0
+                  ? "Create your first session"
+                  : "Select session"
+              }
+            />
+          </SelectTrigger>
+          <SelectContent className="bg-slate-800 border-slate-600 min-w-44">
+            {/* Loading state */}
+            {isLoadingSessions && (
+              <div className="flex items-center gap-2 p-3 text-slate-400">
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span className="text-sm">Loading active sessions...</span>
+              </div>
+            )}
 
-              {/* Error state */}
-              {sessionError && !isLoadingSessions && (
-                <div className="flex items-center gap-2 p-3 text-red-400">
-                  <AlertCircle className="w-4 h-4" />
-                  <span className="text-sm">Failed to load sessions</span>
-                </div>
-              )}
+            {/* Error state */}
+            {sessionError && !isLoadingSessions && (
+              <div className="flex items-center gap-2 p-3 text-red-400">
+                <AlertCircle className="w-4 h-4" />
+                <span className="text-sm">Failed to load sessions</span>
+              </div>
+            )}
 
-              {/* Sessions list */}
-              {!isLoadingSessions && !sessionError && (
-                <>
-                  {sessions.map((session) => (
-                    <SelectItem
-                      key={session.id}
-                      value={session.id}
-                      className="text-slate-100 focus:bg-slate-700 focus:text-slate-50 cursor-pointer py-3 px-3"
-                    >
-                      <div className="flex flex-col items-start w-full min-w-0">
-                        <span className="font-medium text-slate-100 text-sm truncate w-full">
-                          {session.title}
-                        </span>
-                        <div className="flex items-center gap-2 text-xs text-slate-300 mt-1">
-                          <Calendar className="w-3 h-3 flex-shrink-0" />
-                          <span className="flex-shrink-0">
-                            {formatDate(session.lastActivity)}
-                          </span>
-                          {session.messageCount !== undefined && (
-                            <>
-                              <span className="text-slate-500">•</span>
-                              <span className="flex-shrink-0">
-                                {session.messageCount} msg
-                              </span>
-                            </>
-                          )}
-                        </div>
-                      </div>
-                    </SelectItem>
-                  ))}
-                  {/* Create New Session Option */}
+            {/* Sessions list */}
+            {!isLoadingSessions && !sessionError && (
+              <>
+                {sessions.map((session) => (
                   <SelectItem
-                    value="create-new"
-                    className="text-slate-100 focus:bg-slate-700 focus:text-slate-50 border-t border-slate-600 mt-1 cursor-pointer py-3 px-3"
-                    disabled={isCreatingSession}
+                    key={session.id}
+                    value={session.id}
+                    className="text-slate-100 focus:bg-slate-700 focus:text-slate-50 cursor-pointer py-3 px-3"
                   >
-                    <div className="flex items-center gap-2">
-                      {isCreatingSession ? (
-                        <Loader2 className="w-4 h-4 animate-spin text-emerald-400 flex-shrink-0" />
-                      ) : (
-                        <Plus className="w-4 h-4 text-emerald-400 flex-shrink-0" />
-                      )}
-                      <span className="text-emerald-400 font-medium">
-                        {isCreatingSession
-                          ? "Creating..."
-                          : "Create New Session"}
+                    <div className="flex flex-col items-start w-full min-w-0">
+                      <span className="font-medium text-slate-100 text-sm truncate w-full">
+                        {session.title}
                       </span>
+                      <div className="flex items-center gap-2 text-xs text-slate-300 mt-1">
+                        <Calendar className="w-3 h-3 flex-shrink-0" />
+                        <span className="flex-shrink-0">
+                          {formatDate(session.lastActivity)}
+                        </span>
+                        {session.messageCount !== undefined && (
+                          <>
+                            <span className="text-slate-500">•</span>
+                            <span className="flex-shrink-0">
+                              {session.messageCount} msg
+                            </span>
+                          </>
+                        )}
+                      </div>
                     </div>
                   </SelectItem>
-                </>
-              )}
-            </SelectContent>
-          </Select>
-        </div>
-      )}
+                ))}
+                {/* Create New Session Option */}
+                <SelectItem
+                  value="create-new"
+                  className="text-slate-100 focus:bg-slate-700 focus:text-slate-50 border-t border-slate-600 mt-1 cursor-pointer py-3 px-3"
+                  disabled={isCreatingSession}
+                >
+                  <div className="flex items-center gap-2">
+                    {isCreatingSession ? (
+                      <Loader2 className="w-4 h-4 animate-spin text-emerald-400 flex-shrink-0" />
+                    ) : (
+                      <Plus className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                    )}
+                    <span className="text-emerald-400 font-medium">
+                      {isCreatingSession ? "Creating..." : "Create New Session"}
+                    </span>
+                  </div>
+                </SelectItem>
+              </>
+            )}
+          </SelectContent>
+        </Select>
+      </div>
     </div>
   );
 }

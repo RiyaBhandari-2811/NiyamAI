@@ -39,7 +39,7 @@ const JiraAuth = () => {
           connected ? () => handleUserIdChange(userId as string) : handleConnect
         }
       >
-        {connected ? "Disconnect" : "Connect"} {connected.toString()} JIRA
+        {connected ? "Disconnect" : "Connect"} JIRA
       </Button>
     </div>
   );
