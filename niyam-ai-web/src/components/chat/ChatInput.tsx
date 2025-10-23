@@ -7,8 +7,10 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import React from "react";
 import { Badge } from "@/components/ui/badge";
+import { useChatContext } from "./ChatProvider";
 
 const ChatInput = () => {
+  const { userId, connected } = useChatContext();
   const [dragActive, setDragActive] = React.useState(false);
   const [uploadedFile, setUploadedFile] = React.useState<File | null>(null);
   const [urlInput, setUrlInput] = React.useState("");
@@ -75,9 +77,9 @@ const ChatInput = () => {
   };
 
   return (
-    <div className="flex justify-evenly items-center z-10 w-full flex-shrink-0 border-t-2 border-slate-600/80 bg-slate-900/95 backdrop-blur-md shadow-2xl shadow-black/40">
+    <div className="flex justify-center items-center z-10 w-full gap-4 flex-shrink-0 border-t-2 border-slate-600/80 bg-slate-900/95 backdrop-blur-md shadow-2xl shadow-black/40">
       {/* Left: Upload area */}
-      <div className="max-w-4xl w-full p-4 flex justify-between items-center gap-4">
+      <div className="max-w-4xl w-full p-4 ">
         <div className="flex-1">
           <Tabs
             defaultValue="upload"
@@ -204,7 +206,7 @@ const ChatInput = () => {
       <div className="flex-shrink-0 self-end mb-4">
         <Button
           variant="secondary"
-          disabled={!uploadedFile && !urlInput && !textInput} // only enabled if any input
+          disabled={!connected || (!uploadedFile && !urlInput && !textInput)}
           className={`text-lg transition-all duration-300 cursor-pointer
               ${
                 !uploadedFile && !urlInput && !textInput

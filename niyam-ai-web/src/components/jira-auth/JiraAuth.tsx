@@ -24,8 +24,8 @@ const JiraAuth = () => {
 
   // check for the status of connected
   useEffect(() => {
-    if (userId) {
-      console.log(" Checking for connected status");
+    if (userId && !connected) {
+      console.log("Checking for connected status");
       handleUserIdConfirm(userId);
     }
   }, [userId]);
@@ -39,7 +39,7 @@ const JiraAuth = () => {
           connected ? () => handleUserIdChange(userId as string) : handleConnect
         }
       >
-        {connected ? "Disconnect" : "Connect"} JIRA
+        {connected ? "Disconnect" : "Connect"} {connected.toString()} JIRA
       </Button>
     </div>
   );

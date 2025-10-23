@@ -176,15 +176,12 @@ export function useSession(): UseSessionReturn {
       } else {
         // Fallback if crypto.randomUUID is not available
         id = crypto.randomUUID();
-
         console.log(`useSession: generated new userId: ${id}`);
+        localStorage.setItem("agent-engine-user-id", id);
+        console.log("useSession: stored userId in localStorage");
+        setUserId(id);
+        console.log(`useSession: set userId state to: ${id}`);
       }
-
-      localStorage.setItem("agent-engine-user-id", id);
-      console.log("useSession: stored userId in localStorage");
-
-      setUserId(id);
-      console.log(`useSession: set userId state to: ${id}`);
     } catch (error) {
       console.error(
         "useSession: error accessing localStorage or generating UUID:",
