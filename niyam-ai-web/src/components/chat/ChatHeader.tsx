@@ -1,7 +1,23 @@
 import { Bot } from "lucide-react";
 import JiraAuth from "../jira-auth/JiraAuth";
+import { useChatContext } from "@/components/chat/ChatProvider";
+import { Badge } from "../ui/badge";
 
+/**
+ * ChatHeader - User and session management interface
+ * Extracted from ChatMessagesView header section
+ * Handles user ID input and session selection
+ */
 const ChatHeader = () => {
+  const {
+    userId,
+    sessionId,
+    handleUserIdChange,
+    handleUserIdConfirm,
+    handleSessionSwitch,
+    handleCreateNewSession,
+  } = useChatContext();
+
   return (
     <div className="relative z-10 flex-shrink-0 border-b border-slate-700/50 bg-slate-800/80 backdrop-blur-sm">
       <div className="max-w-5xl mx-auto w-full flex justify-between items-center p-4">
@@ -16,17 +32,18 @@ const ChatHeader = () => {
           </div>
         </div>
 
-        <JiraAuth />
-                
-        {/* Right side - User controls */}
-        {/* <div className="flex items-center gap-4"> */}
-          {/* User ID Management */}
-          {/* <UserIdInput
-            currentUserId={userId}
-            onUserIdChange={handleUserIdChange}
-            onUserIdConfirm={handleUserIdConfirm}
-            className="text-xs"
-          /> */}
+        <div className="flex justify-evenly items-center border-2 border-amber-200 gap-2">
+          {userId && (
+            <>
+              <span className="text-lg font-bold text-slate-500">User:</span>
+              <Badge
+                variant="secondary"
+                className="font-bold text-sm -tracking-tight bg-slate-700/50 text-slate-200 border-slate-600/50 hover:bg-slate-600/50"
+              >
+                {userId}
+              </Badge>
+            </>
+          )}
 
           {/* Session Management */}
           {/* {userId && (
@@ -38,7 +55,10 @@ const ChatHeader = () => {
               className="text-xs"
             />
           )} */}
-        {/* </div> */}
+          {/* </div> */}
+
+          <JiraAuth />
+        </div>
       </div>
     </div>
   );
