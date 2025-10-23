@@ -82,9 +82,8 @@ export async function GET(request: Request) {
       );
 
     // Step 4: Redirect on success
-    return NextResponse.redirect(
-      "https://niyam-ai-web.vercel.app/integrations?status=success"
-    );
+    // return NextResponse.redirect("https://niyam-ai-web.vercel.app/");
+    return NextResponse.json({ success: true });
   } catch (error) {
     console.error("OAuth callback error:", error);
     return NextResponse.json(
