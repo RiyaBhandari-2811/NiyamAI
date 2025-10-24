@@ -11,11 +11,11 @@ import React, {
 
 import { useSession } from "@/hooks/useSession";
 import { useMessages } from "@/hooks/useMessages";
-// import { useStreamingManager } from "@/components/chat/StreamingManager";
-import { Message, ProcessedEvent } from "@/types";
-// import { ProcessedEvent } from "@/components/ActivityTimeline";
+import { useStreamingManager } from "@/components/chat/StreamingManager";
+import { Message } from "@/types";
+import { ProcessedEvent } from "@/components/ActivityTimeline";
 import { toast } from "sonner";
-// import { loadSessionHistoryAction } from "@/lib/actions/session-history-actions";
+import { loadSessionHistoryAction } from "@/lib/actions/session-history-actions";
 
 // Context value interface - consolidates all chat state and actions
 export interface ChatContextValue {
@@ -93,206 +93,195 @@ export function ChatProvider({
   } = useMessages();
 
   // Streaming management
-  // const streamingManager = useStreamingManager({
-  //   userId,
-  //   sessionId,
-  //   onMessageUpdate: (message: Message) => {
-  //     console.log("🔄 [CHAT_PROVIDER] onMessageUpdate called:", {
-  //       messageId: message.id,
-  //       messageType: message.type,
-  //       contentLength: message.content.length,
-  //       hasContent: !!message.content,
-  //     });
+  const streamingManager = useStreamingManager({
+    userId,
+    sessionId,
+    onMessageUpdate: (message: Message) => {
+      console.log("🔄 [CHAT_PROVIDER] onMessageUpdate called:", {
+        messageId: message.id,
+        messageType: message.type,
+        contentLength: message.content.length,
+        hasContent: !!message.content,
+      });
 
-  //     setMessages((prev) => {
-  //       const existingMessage = prev.find((msg) => msg.id === message.id);
-  //       console.log("🔍 [CHAT_PROVIDER] Message state check:", {
-  //         messageId: message.id,
-  //         existingMessage: !!existingMessage,
-  //         totalMessages: prev.length,
-  //         lastMessageType:
-  //           prev.length > 0 ? prev[prev.length - 1].type : "none",
-  //       });
+      setMessages((prev) => {
+        const existingMessage = prev.find((msg) => msg.id === message.id);
+        console.log("🔍 [CHAT_PROVIDER] Message state check:", {
+          messageId: message.id,
+          existingMessage: !!existingMessage,
+          totalMessages: prev.length,
+          lastMessageType:
+            prev.length > 0 ? prev[prev.length - 1].type : "none",
+        });
 
-  //       if (existingMessage) {
-  //         // Update existing message while preserving any additional data
-  //         console.log("🔄 [CHAT_PROVIDER] Updating existing message");
-  //         return prev.map((msg) =>
-  //           msg.id === message.id
-  //             ? {
-  //                 ...existingMessage, // Keep existing data
-  //                 ...message, // Update with new content
-  //               }
-  //             : msg
-  //         );
-  //       } else {
-  //         // Create new message with proper initial state
-  //         const newMessage: Message = {
-  //           ...message,
-  //           timestamp: message.timestamp || new Date(),
-  //         };
-  //         console.log("✅ [CHAT_PROVIDER] Creating new message:", {
-  //           id: newMessage.id,
-  //           type: newMessage.type,
-  //           contentLength: newMessage.content.length,
-  //         });
-  //         const newMessages = [...prev, newMessage];
-  //         console.log("📊 [CHAT_PROVIDER] Updated messages array:", {
-  //           totalMessages: newMessages.length,
-  //           lastMessageType: newMessages[newMessages.length - 1].type,
-  //         });
-  //         return newMessages;
-  //       }
-  //     });
-  //   },
-  //   onEventUpdate: (messageId, event) => {
-  //     console.log("📅 [CHAT_PROVIDER] onEventUpdate called:", {
-  //       messageId,
-  //       eventTitle: event.title,
-  //       eventType:
-  //         typeof event.data === "object" && event.data && "type" in event.data
-  //           ? event.data.type
-  //           : undefined,
-  //       isThought: event.title.startsWith("🤔"),
-  //     });
+        if (existingMessage) {
+          // Update existing message while preserving any additional data
+          console.log("🔄 [CHAT_PROVIDER] Updating existing message");
+          return prev.map((msg) =>
+            msg.id === message.id
+              ? {
+                  ...existingMessage, // Keep existing data
+                  ...message, // Update with new content
+                }
+              : msg
+          );
+        } else {
+          // Create new message with proper initial state
+          const newMessage: Message = {
+            ...message,
+            timestamp: message.timestamp || new Date(),
+          };
+          console.log("✅ [CHAT_PROVIDER] Creating new message:", {
+            id: newMessage.id,
+            type: newMessage.type,
+            contentLength: newMessage.content.length,
+          });
+          const newMessages = [...prev, newMessage];
+          console.log("📊 [CHAT_PROVIDER] Updated messages array:", {
+            totalMessages: newMessages.length,
+            lastMessageType: newMessages[newMessages.length - 1].type,
+          });
+          return newMessages;
+        }
+      });
+    },
+    onEventUpdate: (messageId, event) => {
+      console.log("📅 [CHAT_PROVIDER] onEventUpdate called:", {
+        messageId,
+        eventTitle: event.title,
+        eventType:
+          typeof event.data === "object" && event.data && "type" in event.data
+            ? event.data.type
+            : undefined,
+        isThought: event.title.startsWith("🤔"),
+      });
 
-  //     setMessageEvents((prev) => {
-  //       const newMap = new Map(prev);
-  //       const existingEvents = newMap.get(messageId) || [];
-  //       console.log("🔍 [CHAT_PROVIDER] Event state check:", {
-  //         messageId,
-  //         existingEventsCount: existingEvents.length,
-  //         eventTitle: event.title,
-  //       });
+      setMessageEvents((prev) => {
+        const newMap = new Map(prev);
+        const existingEvents = newMap.get(messageId) || [];
+        console.log("🔍 [CHAT_PROVIDER] Event state check:", {
+          messageId,
+          existingEventsCount: existingEvents.length,
+          eventTitle: event.title,
+        });
 
-  //       // Handle thinking activities with progressive content accumulation
-  //       if (event.title.startsWith("🤔")) {
-  //         const existingThinkingIndex = existingEvents.findIndex(
-  //           (existingEvent) => existingEvent.title === event.title
-  //         );
+        // Handle thinking activities with progressive content accumulation
+        if (event.title.startsWith("🤔")) {
+          const existingThinkingIndex = existingEvents.findIndex(
+            (existingEvent) => existingEvent.title === event.title
+          );
 
-  //         if (existingThinkingIndex >= 0) {
-  //           // Accumulate content progressively instead of replacing
-  //           const updatedEvents = [...existingEvents];
-  //           const existingEvent = updatedEvents[existingThinkingIndex];
-  //           const existingData =
-  //             existingEvent.data && typeof existingEvent.data === "object"
-  //               ? existingEvent.data
-  //               : {};
-  //           const existingContent =
-  //             "content" in existingData ? String(existingData.content) : "";
-  //           const newContent =
-  //             event.data &&
-  //             typeof event.data === "object" &&
-  //             "content" in event.data
-  //               ? String(event.data.content)
-  //               : "";
+          if (existingThinkingIndex >= 0) {
+            // Accumulate content progressively instead of replacing
+            const updatedEvents = [...existingEvents];
+            const existingEvent = updatedEvents[existingThinkingIndex];
+            const existingData =
+              existingEvent.data && typeof existingEvent.data === "object"
+                ? existingEvent.data
+                : {};
+            const existingContent =
+              "content" in existingData ? String(existingData.content) : "";
+            const newContent =
+              event.data &&
+              typeof event.data === "object" &&
+              "content" in event.data
+                ? String(event.data.content)
+                : "";
 
-  //           // Accumulate content (don't replace - add new content)
-  //           const accumulatedContent = existingContent
-  //             ? `${existingContent}\n\n${newContent}`
-  //             : newContent;
+            // Accumulate content (don't replace - add new content)
+            const accumulatedContent = existingContent
+              ? `${existingContent}\n\n${newContent}`
+              : newContent;
 
-  //           updatedEvents[existingThinkingIndex] = {
-  //             ...existingEvent,
-  //             data: {
-  //               ...existingData,
-  //               content: accumulatedContent,
-  //             },
-  //           };
-  //           newMap.set(messageId, updatedEvents);
-  //         } else {
-  //           // Add new thinking activity (each distinct thought title)
-  //           newMap.set(messageId, [...existingEvents, event]);
-  //         }
-  //       } else {
-  //         // For non-thinking activities, add normally (no deduplication needed)
-  //         newMap.set(messageId, [...existingEvents, event]);
-  //       }
+            updatedEvents[existingThinkingIndex] = {
+              ...existingEvent,
+              data: {
+                ...existingData,
+                content: accumulatedContent,
+              },
+            };
+            newMap.set(messageId, updatedEvents);
+          } else {
+            // Add new thinking activity (each distinct thought title)
+            newMap.set(messageId, [...existingEvents, event]);
+          }
+        } else {
+          // For non-thinking activities, add normally (no deduplication needed)
+          newMap.set(messageId, [...existingEvents, event]);
+        }
 
-  //       return newMap;
-  //     });
-  //   },
-  //   onWebsiteCountUpdate: updateWebsiteCount,
-  // });
+        return newMap;
+      });
+    },
+    onWebsiteCountUpdate: updateWebsiteCount,
+  });
 
   // Load session history when session changes
   useEffect(() => {
     if (userId && sessionId) {
       // Function to load session history
-      // const loadSessionHistory = async () => {
-      //   try {
-      //     console.log("🔄 [CHAT_PROVIDER] Loading session history:", {
-      //       userId,
-      //       sessionId,
-      //     });
-
-      //     setIsLoadingHistory(true);
-
-      //     // Clear current state
-      //     setMessages([]);
-      //     setMessageEvents(new Map());
-      //     updateWebsiteCount(0);
-
-      //     // Load session history using Server Action (keeps Google Auth on server)
-      //     const result = await loadSessionHistoryAction(userId, sessionId);
-
-      //     if (result.success) {
-      //       console.log(
-      //         "✅ [CHAT_PROVIDER] Session history loaded successfully:",
-      //         {
-      //           messagesCount: result.messages.length,
-      //           eventsCount: result.messageEvents.size,
-      //         }
-      //       );
-
-      //       // Set historical messages
-      //       if (result.messages.length > 0) {
-      //         setMessages(result.messages);
-      //       }
-
-      //       // Set timeline events
-      //       if (result.messageEvents.size > 0) {
-      //         setMessageEvents(result.messageEvents);
-      //       }
-
-      //       console.log("✅ [CHAT_PROVIDER] Session history applied to state");
-      //     } else {
-      //       console.warn(
-      //         "⚠️ [CHAT_PROVIDER] Session history loading failed:",
-      //         result.error
-      //       );
-
-      //       // Show error toast to user
-      //       toast.error("Failed to load chat history", {
-      //         description:
-      //           result.error ||
-      //           "Could not load previous messages for this session.",
-      //       });
-      //     }
-      //   } catch (error) {
-      //     console.error(
-      //       "❌ [CHAT_PROVIDER] Error loading session history:",
-      //       error
-      //     );
-
-      //     // Show error toast to user
-      //     toast.error("Network error", {
-      //       description:
-      //         "Could not connect to load chat history. Please check your connection.",
-      //     });
-
-      //     // On error, just clear state and continue (graceful degradation)
-      //     setMessages([]);
-      //     setMessageEvents(new Map());
-      //     updateWebsiteCount(0);
-      //   } finally {
-      //     setIsLoadingHistory(false);
-      //   }
-      // };
-
+      const loadSessionHistory = async () => {
+        try {
+          console.log("🔄 [CHAT_PROVIDER] Loading session history:", {
+            userId,
+            sessionId,
+          });
+          setIsLoadingHistory(true);
+          // Clear current state
+          setMessages([]);
+          setMessageEvents(new Map());
+          updateWebsiteCount(0);
+          // Load session history using Server Action (keeps Google Auth on server)
+          const result = await loadSessionHistoryAction(userId, sessionId);
+          if (result.success) {
+            console.log(
+              "✅ [CHAT_PROVIDER] Session history loaded successfully:",
+              {
+                messagesCount: result.messages.length,
+                eventsCount: result.messageEvents.size,
+              }
+            );
+            // Set historical messages
+            if (result.messages.length > 0) {
+              setMessages(result.messages);
+            }
+            // Set timeline events
+            if (result.messageEvents.size > 0) {
+              setMessageEvents(result.messageEvents);
+            }
+            console.log("✅ [CHAT_PROVIDER] Session history applied to state");
+          } else {
+            console.warn(
+              "⚠️ [CHAT_PROVIDER] Session history loading failed:",
+              result.error
+            );
+            // Show error toast to user
+            toast.error("Failed to load chat history", {
+              description:
+                result.error ||
+                "Could not load previous messages for this session.",
+            });
+          }
+        } catch (error) {
+          console.error(
+            "❌ [CHAT_PROVIDER] Error loading session history:",
+            error
+          );
+          // Show error toast to user
+          toast.error("Network error", {
+            description:
+              "Could not connect to load chat history. Please check your connection.",
+          });
+          // On error, just clear state and continue (graceful degradation)
+          setMessages([]);
+          setMessageEvents(new Map());
+          updateWebsiteCount(0);
+        } finally {
+          setIsLoadingHistory(false);
+        }
+      };
       // Load session history
-      // loadSessionHistory();
+      loadSessionHistory();
     }
   }, [userId, sessionId, setMessages, setMessageEvents, updateWebsiteCount]);
 
@@ -343,15 +332,14 @@ export function ChatProvider({
         addMessage(userMessage);
 
         // Submit message for streaming - the backend will provide AI response
-        // await streamingManager.submitMessage(query);
+        await streamingManager.submitMessage(query);
       } catch (error) {
         console.error("Error submitting message:", error);
         // Don't create fake error messages - let the UI handle the error state
         throw error;
       }
     },
-    [userId, sessionId, addMessage]
-    // [userId, sessionId, addMessage, streamingManager]
+    [userId, sessionId, addMessage, streamingManager]
   );
 
   // Context value
