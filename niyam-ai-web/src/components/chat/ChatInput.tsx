@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { useChatContext } from "./ChatProvider";
 
 const ChatInput = () => {
-  const { userId, connected } = useChatContext();
+  const { userId, connected, handleSubmit } = useChatContext();
   const [dragActive, setDragActive] = React.useState(false);
   const [uploadedFile, setUploadedFile] = React.useState<File | null>(null);
   const [urlInput, setUrlInput] = React.useState("");
@@ -76,10 +76,45 @@ const ChatInput = () => {
     }
   };
 
+  const onSubmit = async () => {
+    let payload: any = {};
+
+    if (uploadedFile) {
+      const base64 = await fileToBase64(uploadedFile);
+      payload = { type: "file", mime: uploadedFile.type, data: base64 };
+      setUploadedFile(null);
+    } else if (urlInput) {
+      payload = { type: "url", data: urlInput };
+      setUrlInput("");
+    } else if (textInput) {
+      payload = { type: "text", data: textInput };
+      setTextInput("");
+    } else {
+      return;
+    }
+
+    handleSubmit(JSON.stringify(payload));
+  };
+  function fileToBase64(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+
+      reader.onload = () => {
+        const result = reader.result as string;
+        // Remove prefix like "data:application/pdf;base64,"
+        const base64Data = result.split(",")[1];
+        resolve(base64Data);
+      };
+
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
   return (
-    <div className="flex justify-center items-center z-10 w-full gap-4 flex-shrink-0 border-t-2 border-slate-600/80 bg-slate-900/95 backdrop-blur-md shadow-2xl shadow-black/40">
+    <div className="flex justify-center items-center z-10 w-full gap-4 flex-shrink-0 border-t-2 border-slate-600/80">
       {/* Left: Upload area */}
-      <div className="max-w-4xl w-full p-4 ">
+      <div className="max-w-4xl w-full p-4">
         <div className="flex-1">
           <Tabs
             defaultValue="upload"
@@ -206,10 +241,11 @@ const ChatInput = () => {
       <div className="flex-shrink-0 self-end mb-4">
         <Button
           variant="secondary"
+          onClick={onSubmit}
           disabled={!connected || (!uploadedFile && !urlInput && !textInput)}
           className={`text-lg transition-all duration-300 cursor-pointer
               ${
-                !uploadedFile && !urlInput && !textInput
+                !connected || (!uploadedFile && !urlInput && !textInput)
                   ? "opacity-50 cursor-not-allowed"
                   : "hover:bg-slate-600 hover:text-secondary cursor-pointer"
               }`}

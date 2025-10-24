@@ -6,6 +6,7 @@
  */
 
 import { NextRequest } from "next/server";
+import { json } from "stream/consumers";
 
 /**
  * Gets the ADK app name from environment or defaults
@@ -94,18 +95,23 @@ export async function parseStreamRequest(request: NextRequest): Promise<{
   validation: StreamValidationResult;
 }> {
   try {
+    console.log("parseStreamRequest: reading request body...");
     const requestBody = (await request.json()) as {
       message?: string;
       userId?: string;
       sessionId?: string;
     };
+    // console.log("parseStreamRequest: requestBody =", requestBody);
 
     // Validate the request structure
     const validation = validateStreamRequest(requestBody);
+    console.log("parseStreamRequest: validation =", validation);
     if (!validation.isValid) {
+      console.log("parseStreamRequest: invalid request -", validation.error);
       return { data: null, validation };
     }
 
+    console.log("parseStreamRequest: request is valid");
     return {
       data: {
         message: requestBody.message!,
@@ -137,10 +143,10 @@ export function validateStreamRequest(requestBody: {
   userId?: string;
   sessionId?: string;
 }): StreamValidationResult {
-  if (!requestBody.message?.trim()) {
+  if (!requestBody.message) {
     return {
       isValid: false,
-      error: "Message is required",
+      error: `Message is required}`,
     };
   }
 
@@ -170,12 +176,39 @@ export function validateStreamRequest(requestBody: {
 export function formatAgentEnginePayload(
   requestData: ProcessedStreamRequest
 ): AgentEnginePayload {
+  let messagePayload: any = {};
+
+  try {
+    const payload = JSON.parse(requestData.message || "{}");
+
+    if (payload.type === "text") {
+      messagePayload = { parts: [{ text: String(payload.data) }] };
+    } else if (payload.type === "file") {
+      messagePayload = {
+        parts: [
+          {
+            text: JSON.stringify({
+              type: "file",
+              mimeType: payload.mime,
+              data: payload.data,
+            }),
+          },
+        ],
+      };
+    } else if (payload.type === "url") {
+      messagePayload = { parts: [{ text: payload.data }] };
+    }
+  } catch (e) {
+    // fallback for plain text
+    messagePayload = { parts: [{ text: requestData.message }] };
+  }
+
   return {
     class_method: "stream_query",
     input: {
       user_id: requestData.userId,
       session_id: requestData.sessionId,
-      message: requestData.message,
+      message: messagePayload,
     },
   };
 }
@@ -186,15 +219,95 @@ export function formatAgentEnginePayload(
  * @param requestData - Processed request data
  * @returns Local backend formatted payload
  */
+// export function formatLocalBackendPayload(
+//   requestData: ProcessedStreamRequest
+// ): any {
+//   let parts: any = [];
+
+//   try {
+//     const payload = JSON.parse(requestData.message || "{}");
+
+//     if (payload.type === "text") {
+//       parts = [{ text: String(payload.data) }];
+//     } else if (payload.type === "file") {
+//       console.log("File Type detected");
+
+//       parts = [
+//         {
+//           text: JSON.stringify({
+//             type: "file",
+//             mimeType: payload.mime,
+//             data: payload.data,
+//           }),
+//         },
+//       ];
+//     } else if (payload.type === "url") {
+//       parts = [{ text: payload.data }];
+//     }
+//   } catch (e) {
+//     // fallback in case message is just plain text
+//     parts = [{ text: requestData.message }];
+//   }
+
+//   return {
+//     appName: getAdkAppName(),
+//     userId: requestData.userId,
+//     sessionId: requestData.sessionId,
+//     newMessage: {
+//       parts,
+//       role: "user",
+//     },
+//     streaming: true,
+//   };
+// }
+
 export function formatLocalBackendPayload(
   requestData: ProcessedStreamRequest
 ): LocalBackendPayload {
+  let parts: { text: string }[] = [];
+
+  try {
+    const payload = JSON.parse(requestData.message || "{}");
+
+    switch (payload.type) {
+      case "text":
+      case "url":
+        if (typeof requestData.message === "object") {
+          parts = [{ text: JSON.stringify(requestData.message) }];
+        } else {
+          parts = [{ text: String(requestData.message).trim() }];
+        }
+
+        break;
+
+      case "file":
+        parts = [
+          {
+            text: JSON.stringify({
+              type: "file",
+              mimeType: payload.mime,
+              filename: payload.filename || "file.pdf",
+              data: payload.data, // base64 string
+            }),
+          },
+        ];
+        break;
+
+      default:
+        parts = [{ text: String(requestData.message).trim() }];
+        break;
+    }
+  } catch (e) {
+    // fallback in case message is just plain text and not JSON
+    parts = [{ text: String(requestData.message).trim() }];
+  }
+
   return {
     appName: getAdkAppName(),
     userId: requestData.userId,
     sessionId: requestData.sessionId,
     newMessage: {
-      parts: [{ text: requestData.message }],
+      parts,
       role: "user",
     },
     streaming: true,
@@ -218,7 +331,7 @@ export function logStreamRequest(
   const truncatedMessage =
     message.length > 50 ? message.substring(0, 50) + "..." : message;
   console.log(
-    `📨 Stream Request [${deploymentType}] - Session: ${sessionId}, User: ${userId}, Message: ${truncatedMessage}`
+    `📨 Stream Request [${deploymentType}] - Session: ${sessionId}, User: ${userId}`
   );
 }
 
@@ -235,7 +348,6 @@ export function logStreamStart(
   deploymentType: "agent_engine" | "local_backend"
 ): void {
   console.log(`🔗 Forwarding to ${deploymentType}: ${url}`);
-  console.log(`📤 Payload:`, payload);
 }
 
 /**

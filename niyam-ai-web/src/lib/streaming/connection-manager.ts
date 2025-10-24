@@ -63,11 +63,66 @@ export class StreamingConnectionManager {
     this.abortController = new AbortController();
 
     try {
-      createDebugLog(
-        "CONNECTION",
-        "Sending API request with payload",
-        apiPayload
-      );
+      createDebugLog("CONNECTION", "Sending API request with payload");
+
+      let messagePayload: any = {};
+
+      const payload = JSON.parse(apiPayload.message || "{}");
+
+      console.log("RIYA MESSAGE: ", apiPayload.message);
+
+      // if (payload.type === "text") {
+      //   messagePayload = { parts: [{ text: String(payload.data) }] };
+      // } else if (payload.type === "file") {
+      //   messagePayload = {
+      //     parts: [
+      //       {
+      //         text: JSON.stringify({
+      //           type: "file",
+      //           mimeType: payload.mime,
+      //           data: payload.data,
+      //         }),
+      //       },
+      //     ],
+      //   };
+      // } else if (payload.type === "url") {
+      //   messagePayload = { parts: [{ text: payload.data }] };
+      // }
+
+      switch (payload.type) {
+        case "text":
+        case "url":
+          if (typeof payload.message === "object") {
+            messagePayload = [{ text: JSON.stringify(payload.message) }];
+          } else {
+            messagePayload = [{ text: String(payload.message).trim() }];
+          }
+
+          break;
+
+        case "file":
+          messagePayload = [
+            {
+              text: JSON.stringify({
+                type: "file",
+                mimeType: payload.mime,
+                filename: payload.filename || "file.pdf",
+                data: payload.data, // base64 string
+              }),
+            },
+          ];
+          break;
+
+        default:
+          messagePayload = [{ text: String(payload.message).trim() }];
+          break;
+      }
+
+      let apiPayloadWithData = {
+        userId: apiPayload.userId,
+        sessionId: apiPayload.sessionId,
+        message: messagePayload,
+      };
 
       const response = await this.retryFn(() =>
         fetch(this.endpoint, {
@@ -75,7 +130,7 @@ export class StreamingConnectionManager {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(apiPayload),
+          body: JSON.stringify(apiPayloadWithData),
           signal: this.abortController?.signal,
         })
       );
