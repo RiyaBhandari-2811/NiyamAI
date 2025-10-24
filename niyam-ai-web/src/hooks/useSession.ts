@@ -47,41 +47,41 @@ export function useSession(): UseSessionReturn {
   // Handle new session creation
   const handleCreateNewSession = useCallback(
     async (sessionUserId: string): Promise<void> => {
-      // if (!sessionUserId) {
-      //   throw new Error("User ID is required to create a session");
-      // }
-      // let actualSessionId = "";
-      // try {
-      //   // Import Server Action dynamically to avoid circular dependencies in hooks
-      //   const { createSessionAction } = await import(
-      //     "@/lib/actions/session-actions"
-      //   );
-      //   const sessionResult = await createSessionAction(sessionUserId);
-      //   if (sessionResult.success) {
-      //     // Use the session ID returned by the backend
-      //     if (!sessionResult.sessionId) {
-      //       throw new Error(
-      //         "Session creation succeeded but no session ID was returned"
-      //       );
-      //     }
-      //     actualSessionId = sessionResult.sessionId;
-      //     console.log(
-      //       `✅ Session created via Server Action: ${actualSessionId}`
-      //     );
-      //     console.log(`📝 Session result:`, sessionResult);
-      //   } else {
-      //     console.error(
-      //       "❌ Session creation Server Action failed:",
-      //       sessionResult.error
-      //     );
-      //     throw new Error(`Session creation failed: ${sessionResult.error}`);
-      //   }
-      // } catch (error) {
-      //   console.error("❌ Session creation Server Action error:", error);
-      //   throw error;
-      // }
-      // console.log(`🔄 Switching to new session: ${actualSessionId}`);
-      // handleSessionSwitch(actualSessionId);
+      if (!sessionUserId) {
+        throw new Error("User ID is required to create a session");
+      }
+      let actualSessionId = "";
+      try {
+        // Import Server Action dynamically to avoid circular dependencies in hooks
+        const { createSessionAction } = await import(
+          "@/lib/actions/session-actions"
+        );
+        const sessionResult = await createSessionAction(sessionUserId);
+        if (sessionResult.success) {
+          // Use the session ID returned by the backend
+          if (!sessionResult.sessionId) {
+            throw new Error(
+              "Session creation succeeded but no session ID was returned"
+            );
+          }
+          actualSessionId = sessionResult.sessionId;
+          console.log(
+            `✅ Session created via Server Action: ${actualSessionId}`
+          );
+          console.log(`📝 Session result:`, sessionResult);
+        } else {
+          console.error(
+            "❌ Session creation Server Action failed:",
+            sessionResult.error
+          );
+          throw new Error(`Session creation failed: ${sessionResult.error}`);
+        }
+      } catch (error) {
+        console.error("❌ Session creation Server Action error:", error);
+        throw error;
+      }
+      console.log(`🔄 Switching to new session: ${actualSessionId}`);
+      handleSessionSwitch(actualSessionId);
     },
     [handleSessionSwitch]
   );
