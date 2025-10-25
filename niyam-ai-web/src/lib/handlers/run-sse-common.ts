@@ -275,16 +275,13 @@ export function formatLocalBackendPayload(
   };
 
   console.group("[formatLocalBackendPayload] Input Debug");
-  console.log(
-    "➡️ Raw requestData.message:",
-    safeStringify(requestData.message)
-  );
+  console.log("➡️ Raw requestData.message:", safeStringify(requestData.message));
   console.groupEnd();
 
   try {
     let baseMessage: any = requestData.message;
 
-    // ✅ FIX: handle array or object message formats
+    // Handle array or object message formats
     if (Array.isArray(baseMessage)) {
       console.log("📋 Message is an array, extracting text field.");
       baseMessage = baseMessage[0]?.text || "";
@@ -293,7 +290,7 @@ export function formatLocalBackendPayload(
       baseMessage = baseMessage.text;
     }
 
-    // If stringified JSON, try parsing it
+    // Parse stringified JSON if possible
     let payload: any = {};
     if (typeof baseMessage === "string") {
       try {
@@ -301,17 +298,26 @@ export function formatLocalBackendPayload(
       } catch {
         payload = { type: "text", content: baseMessage };
       }
+    } else {
+      // Already an object
+      payload = baseMessage;
     }
 
     console.group("[formatLocalBackendPayload] Parsed Payload");
     console.log("✅ Parsed payload:", safeStringify(payload));
     console.groupEnd();
 
+    // Handle payload based on type
     switch (payload.type) {
       case "text":
       case "url":
         console.log("📝 Handling text/url payload");
-        parts = [{ text: String(baseMessage).trim() }];
+        // Use payload.content if exists, fallback to stringified payload
+        const textContent =
+          typeof payload.content === "string"
+            ? payload.content.trim()
+            : safeStringify(payload).trim();
+        parts = [{ text: textContent }];
         break;
 
       case "file":
@@ -330,7 +336,7 @@ export function formatLocalBackendPayload(
 
       default:
         console.log("⚙️ Default case: treating as plain text");
-        parts = [{ text: String(baseMessage).trim() }];
+        parts = [{ text: safeStringify(payload).trim() }];
         break;
     }
   } catch (e) {
@@ -357,6 +363,7 @@ export function formatLocalBackendPayload(
 
   return finalPayload;
 }
+
 
 /**
  * Centralized logging for stream operations

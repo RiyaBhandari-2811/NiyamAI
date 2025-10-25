@@ -306,6 +306,9 @@ export function ChatProvider({
     ): Promise<void> => {
       if (!query.trim()) return;
 
+      console.log("query: ", query);
+      console.log("query JSON: ", JSON.parse(query));
+
       // Use provided userId or current state
       const currentUserId = requestUserId || userId;
       if (!currentUserId) {

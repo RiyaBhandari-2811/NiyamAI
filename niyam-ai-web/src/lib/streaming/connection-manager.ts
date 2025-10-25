@@ -65,11 +65,17 @@ export class StreamingConnectionManager {
     try {
       createDebugLog("CONNECTION", "Sending API request with payload");
 
-      let messagePayload: any = {};
+      console.log("connection-manager before: ", apiPayload.message);
+      console.log(
+        "connection-manager before : ",
+        JSON.parse(apiPayload.message)
+      );
 
-      const payload = JSON.parse(apiPayload.message || "{}");
+      const payload = JSON.parse(apiPayload.message);
 
-      console.log("RIYA MESSAGE: ", apiPayload.message);
+      console.log("payload: ", payload);
+
+      // console.log("RIYA MESSAGE: ", apiPayload.message);
 
       // if (payload.type === "text") {
       //   messagePayload = { parts: [{ text: String(payload.data) }] };
@@ -89,13 +95,23 @@ export class StreamingConnectionManager {
       //   messagePayload = { parts: [{ text: payload.data }] };
       // }
 
+      var messagePayload: any = {};
+
       switch (payload.type) {
         case "text":
         case "url":
-          if (typeof payload.message === "object") {
-            messagePayload = [{ text: JSON.stringify(payload.message) }];
+          const content = payload.message ?? payload.data;
+
+          console.log("typeof content: ", typeof content);
+          if (typeof content === "object") {
+            console.log(
+              "JSON.stringify(content) Object: ",
+              JSON.stringify(content)
+            );
+            messagePayload = [{ text: JSON.stringify(content) }];
           } else {
-            messagePayload = [{ text: String(payload.message).trim() }];
+            console.log("String(content).trim(): ", String(content).trim());
+            messagePayload = [{ text: String(content).trim() }];
           }
 
           break;
@@ -123,6 +139,8 @@ export class StreamingConnectionManager {
         sessionId: apiPayload.sessionId,
         message: messagePayload,
       };
+
+      console.log("connection-manager: after ", messagePayload);
 
       const response = await this.retryFn(() =>
         fetch(this.endpoint, {
