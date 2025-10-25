@@ -73,82 +73,83 @@ export async function handleLocalBackendStreamRequest(
     console.log("🔐 Auth headers obtained for local backend:", authHeaders);
 
     // Forward request to local backend
-    const response = await fetch(localBackendUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        ...authHeaders,
-      },
-      body: JSON.stringify(localBackendPayload),
-    });
+    // const response = await fetch(localBackendUrl, {
+    //   method: "POST",
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //     ...authHeaders,
+    //   },
+    //   body: JSON.stringify(localBackendPayload),
+    // });
 
-    console.log(
-      `⬅️  Received response from local backend: ${response.status} ${response.statusText}`
-    );
+    // console.log(
+    //   `⬅️  Received response from local backend: ${response.status} ${response.statusText}`
+    // );
 
     // Validate response before streaming
-    const validation = validateStreamingResponse(response);
-    if (!validation.isValid) {
-      console.error(`❌ Local backend error: ${validation.error}`);
-      console.log("ℹ️  Attempting to read error details from response body...");
+    //   const validation = validateStreamingResponse(response);
+    //   if (!validation.isValid) {
+    //     console.error(`❌ Local backend error: ${validation.error}`);
+    //     console.log("ℹ️  Attempting to read error details from response body...");
 
-      // Try to get error details from response
-      let errorDetails = validation.error || "Unknown error";
-      try {
-        const errorText = await response.text();
-        console.error(`❌ Error details:`);
-        if (errorText) {
-          errorDetails = `${validation.error}. ${errorText}`;
-        }
-      } catch {
-        // If response is already consumed, use original error
-        console.log(
-          "ℹ️  Could not read response body for error details (already consumed)"
-        );
-      }
+    //     // Try to get error details from response
+    //     let errorDetails = validation.error || "Unknown error";
+    //     try {
+    //       const errorText = await response.text();
+    //       console.error(`❌ Error details:`);
+    //       if (errorText) {
+    //         errorDetails = `${validation.error}. ${errorText}`;
+    //       }
+    //     } catch {
+    //       // If response is already consumed, use original error
+    //       console.log(
+    //         "ℹ️  Could not read response body for error details (already consumed)"
+    //       );
+    //     }
 
-      return createBackendConnectionError(
-        "local_backend",
-        response.status,
-        response.statusText,
-        errorDetails
-      );
-    }
+    //     return createBackendConnectionError(
+    //       "local_backend",
+    //       response.status,
+    //       response.statusText,
+    //       errorDetails
+    //     );
+    //   }
 
-    // Log successful response
-    logStreamResponse(
-      response.status,
-      response.statusText,
-      response.headers,
-      "local_backend"
-    );
+    //   // Log successful response
+    //   logStreamResponse(
+    //     response.status,
+    //     response.statusText,
+    //     response.headers,
+    //     "local_backend"
+    //   );
 
-    console.log("✅ Forwarding SSE stream from local backend to client");
+    //   console.log("✅ Forwarding SSE stream from local backend to client");
 
-    // The local ADK backend produces a valid SSE stream, so we forward it directly
-    // without the complex processing needed for Agent Engine.
-    return new Response(response.body, {
-      status: 200,
-      headers: SSE_HEADERS,
-    });
-  } catch (error) {
-    console.error("❌ Local backend handler error:", error);
+    //   // The local ADK backend produces a valid SSE stream, so we forward it directly
+    //   // without the complex processing needed for Agent Engine.
+    //   return new Response(response.body, {
+    //     status: 200,
+    //     headers: SSE_HEADERS,
+    //   });
+    // } catch (error) {
+    //   console.error("❌ Local backend handler error:", error);
 
-    if (error instanceof TypeError && error.message.includes("fetch")) {
-      console.log("ℹ️  Detected fetch failure when contacting local backend");
-      return createBackendConnectionError(
-        "local_backend",
-        500,
-        "Connection failed",
-        "Failed to connect to local backend"
-      );
-    }
+    //   if (error instanceof TypeError && error.message.includes("fetch")) {
+    //     console.log("ℹ️  Detected fetch failure when contacting local backend");
+    //     return createBackendConnectionError(
+    //       "local_backend",
+    //       500,
+    //       "Connection failed",
+    //       "Failed to connect to local backend"
+    //     );
+    //   }
 
     return createStreamingError(
       "local_backend",
-      error,
+      null,
       "Failed to process local backend streaming request"
     );
+  } finally {
   }
 }
 

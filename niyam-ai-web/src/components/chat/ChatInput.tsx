@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { useChatContext } from "./ChatProvider";
 
 const ChatInput = () => {
-  const { userId, connected, handleSubmit } = useChatContext();
+  const { setOriginalUploadedFile, connected, handleSubmit } = useChatContext();
   const [dragActive, setDragActive] = React.useState(false);
   const [uploadedFile, setUploadedFile] = React.useState<File | null>(null);
   const [urlInput, setUrlInput] = React.useState("");
@@ -36,12 +36,14 @@ const ChatInput = () => {
 
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       setUploadedFile(e.dataTransfer.files[0]);
+      setOriginalUploadedFile(e.dataTransfer.files[0]);
     }
   };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setUploadedFile(e.target.files[0]);
+      setOriginalUploadedFile(e.target.files[0]);
     }
   };
 
@@ -56,11 +58,14 @@ const ChatInput = () => {
   const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     if (e.target.value) {
       setTextInput(e.target.value);
+      setUploadedFile(null); // clear File
+      setUrlInput("");
     }
   };
 
   const removeFile = () => {
     setUploadedFile(null);
+    setOriginalUploadedFile(null);
   };
 
   const getFileIcon = (fileName: string) => {

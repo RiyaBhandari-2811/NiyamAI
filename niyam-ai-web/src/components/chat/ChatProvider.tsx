@@ -50,6 +50,10 @@ export interface ChatContextValue {
 
   // Refs for external access
   scrollAreaRef: React.RefObject<HTMLDivElement | null>;
+
+  //Uploaded file states
+  originalUploadedFile: File | null;
+  setOriginalUploadedFile: React.Dispatch<React.SetStateAction<File | null>>;
 }
 
 interface ChatProviderProps {
@@ -70,6 +74,11 @@ export function ChatProvider({
 
   // Session history loading state
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
+
+  // Store the origin instance of file upload:
+  const [originalUploadedFile, setOriginalUploadedFile] = useState<File | null>(
+    null
+  );
 
   // Consolidate all hooks
   const {
@@ -376,6 +385,9 @@ export function ChatProvider({
 
     // Refs
     scrollAreaRef,
+
+    originalUploadedFile,
+    setOriginalUploadedFile,
   };
 
   return (
