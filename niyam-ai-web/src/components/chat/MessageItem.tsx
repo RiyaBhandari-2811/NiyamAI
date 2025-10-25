@@ -39,9 +39,15 @@ export function MessageItem({
   };
 
   console.log("Message: ", message);
-  const messageContent = JSON.parse(message.content);
+  let messageContent: any;
+
+  try {
+    messageContent = JSON.parse(message.content);
+  } catch (e) {
+    messageContent = message.content;
+  }
+
   console.log("messageContent: ", messageContent);
-  console.log("originalUploadedFile: ", originalUploadedFile);
 
   const getFileIcon = (fileName: string | null) => {
     const extension = fileName?.split(".").pop()?.toLowerCase();
