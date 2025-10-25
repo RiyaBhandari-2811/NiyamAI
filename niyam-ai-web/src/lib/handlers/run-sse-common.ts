@@ -266,43 +266,80 @@ export function formatLocalBackendPayload(
 ): LocalBackendPayload {
   let parts: { text: string }[] = [];
 
+  const safeStringify = (data: any) => {
+    try {
+      return JSON.stringify(data, null, 2);
+    } catch {
+      return String(data);
+    }
+  };
+
+  console.group("[formatLocalBackendPayload] Input Debug");
+  console.log(
+    "➡️ Raw requestData.message:",
+    safeStringify(requestData.message)
+  );
+  console.groupEnd();
+
   try {
-    const payload = JSON.parse(requestData.message || "{}");
+    let baseMessage: any = requestData.message;
+
+    // ✅ FIX: handle array or object message formats
+    if (Array.isArray(baseMessage)) {
+      console.log("📋 Message is an array, extracting text field.");
+      baseMessage = baseMessage[0]?.text || "";
+    } else if (typeof baseMessage === "object" && baseMessage.text) {
+      console.log("📋 Message is an object with text field, using that.");
+      baseMessage = baseMessage.text;
+    }
+
+    // If stringified JSON, try parsing it
+    let payload: any = {};
+    if (typeof baseMessage === "string") {
+      try {
+        payload = JSON.parse(baseMessage);
+      } catch {
+        payload = { type: "text", content: baseMessage };
+      }
+    }
+
+    console.group("[formatLocalBackendPayload] Parsed Payload");
+    console.log("✅ Parsed payload:", safeStringify(payload));
+    console.groupEnd();
 
     switch (payload.type) {
       case "text":
       case "url":
-        if (typeof requestData.message === "object") {
-          parts = [{ text: JSON.stringify(requestData.message) }];
-        } else {
-          parts = [{ text: String(requestData.message).trim() }];
-        }
-
+        console.log("📝 Handling text/url payload");
+        parts = [{ text: String(baseMessage).trim() }];
         break;
 
       case "file":
+        console.log("📦 Handling file payload");
         parts = [
           {
-            text: JSON.stringify({
+            text: safeStringify({
               type: "file",
               mimeType: payload.mime,
               filename: payload.filename || "file.pdf",
-              data: payload.data, // base64 string
+              data: payload.data,
             }),
           },
         ];
         break;
 
       default:
-        parts = [{ text: String(requestData.message).trim() }];
+        console.log("⚙️ Default case: treating as plain text");
+        parts = [{ text: String(baseMessage).trim() }];
         break;
     }
   } catch (e) {
-    // fallback in case message is just plain text and not JSON
+    console.error("❌ Failed to process message:", e);
+    console.log("🧩 Fallback raw message:", safeStringify(requestData.message));
     parts = [{ text: String(requestData.message).trim() }];
   }
 
-  return {
+  const finalPayload: LocalBackendPayload = {
     appName: getAdkAppName(),
     userId: requestData.userId,
     sessionId: requestData.sessionId,
@@ -312,6 +349,13 @@ export function formatLocalBackendPayload(
     },
     streaming: true,
   };
+
+  console.group("[formatLocalBackendPayload] Final Payload");
+  console.log("🧾 parts:", safeStringify(parts));
+  console.log("🚀 full payload:", safeStringify(finalPayload));
+  console.groupEnd();
+
+  return finalPayload;
 }
 
 /**
