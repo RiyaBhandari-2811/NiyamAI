@@ -1,8 +1,8 @@
 "use client";
 
 import EmptyState from "@/components/chat/EmptyState";
-import MessageArea from "@/components/chat/MessageArea";
-// import { useChatContext } from "@/components/chat/ChatProvider";
+import { MessageArea } from "@/components/chat/MessageArea";
+import { useChatContext } from "@/components/chat/ChatProvider";
 
 /**
  * ChatContent - Conditional rendering container
@@ -10,12 +10,11 @@ import MessageArea from "@/components/chat/MessageArea";
  * Handles the conditional logic that was in ChatMessagesView
  */
 export default function ChatContent(): React.JSX.Element {
-  // const { messages } = useChatContext();
+  const { messages } = useChatContext();
 
-  return ( 
-    <EmptyState />
-    // <div className={`h-full ${messages.length === 0 ? "flex" : ""}`}>
-    //   {messages.length === 0 ? <EmptyState /> : <MessageArea />}
-    // </div>
+  return (
+    <div className={`h-full ${messages.length === 0 ? "flex" : ""}`}>
+      {messages.length === 0 ? <EmptyState /> : <MessageArea />}
+    </div>
   );
 }

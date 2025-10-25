@@ -115,7 +115,7 @@ export async function handleLocalBackendStreamRequest(
       );
     }
 
-    // Log successful response
+    //  Log successful response
     logStreamResponse(
       response.status,
       response.statusText,
@@ -146,7 +146,7 @@ export async function handleLocalBackendStreamRequest(
 
     return createStreamingError(
       "local_backend",
-      error,
+      null,
       "Failed to process local backend streaming request"
     );
   }
