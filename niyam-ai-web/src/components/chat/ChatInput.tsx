@@ -87,7 +87,9 @@ const ChatInput = () => {
       payload = { type: "url", data: urlInput };
       setUrlInput("");
     } else if (textInput) {
+      console.log("RIYA TEXT INPUT: ", textInput);
       payload = { type: "text", data: textInput };
+      console.log("payload ", payload.data);
       setTextInput("");
     } else {
       return;
@@ -95,6 +97,7 @@ const ChatInput = () => {
 
     handleSubmit(JSON.stringify(payload));
   };
+
   function fileToBase64(file: File): Promise<string> {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();

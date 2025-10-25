@@ -62,6 +62,12 @@ export function useStreaming(
         throw new Error("Connection manager not initialized");
       }
 
+      console.log("useStreaming startStream: ", apiPayload.message);
+      console.log(
+        "useStreaming startStream json: ",
+        JSON.parse(apiPayload.message)
+      );
+
       // Generate AI message ID (frontend generates ID for streaming correlation)
       const aiMessageId = uuidv4();
 

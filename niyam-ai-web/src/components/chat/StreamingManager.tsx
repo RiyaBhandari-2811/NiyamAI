@@ -52,6 +52,9 @@ export function useStreamingManager({
         throw new Error("Message, userId, and sessionId are required");
       }
 
+      console.log("Streaming Message: ", message);
+      console.log("Streaming Message JSON: ", JSON.parse(message));
+
       const apiPayload = {
         message: message.trim(),
         userId,
