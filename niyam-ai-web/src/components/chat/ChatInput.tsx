@@ -92,14 +92,24 @@ const ChatInput = () => {
 
     if (uploadedFile) {
       const base64 = await fileToBase64(uploadedFile);
-      payload = { type: "file", mime: uploadedFile.type, data: base64 };
+      payload = {
+        type: "file",
+        mime: uploadedFile.type,
+        data: base64 + `Project Key: ${selectedProject}`,
+      };
       setUploadedFile(null);
     } else if (urlInput) {
-      payload = { type: "url", data: urlInput };
+      payload = {
+        type: "url",
+        data: urlInput + `Project Key: ${selectedProject}`,
+      };
       setUrlInput("");
     } else if (textInput) {
       console.log("RIYA TEXT INPUT: ", textInput);
-      payload = { type: "text", data: textInput };
+      payload = {
+        type: "text",
+        data: textInput + `Project Key: ${selectedProject}`,
+      };
       console.log("payload ", payload.data);
       setTextInput("");
     } else {

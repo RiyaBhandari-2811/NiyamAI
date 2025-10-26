@@ -13,6 +13,10 @@ export interface UseSessionReturn {
   // Session management
   handleSessionSwitch: (newSessionId: string) => void;
   handleCreateNewSession: (sessionUserId: string) => Promise<void>;
+
+  //Jira Project
+  selectedProject: string | null;
+  setSelectedProject: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
 /**
@@ -22,6 +26,9 @@ export function useSession(): UseSessionReturn {
   const [sessionId, setSessionId] = useState<string>("");
   const [userId, setUserId] = useState<string | null>(null);
   const [connected, setConnected] = useState<boolean>(false);
+
+  // Store the selected jira project
+  const [selectedProject, setSelectedProject] = useState<string | null>(null);
 
   // Handle session switching
   const handleSessionSwitch = useCallback(
@@ -115,6 +122,7 @@ export function useSession(): UseSessionReturn {
           // Step 3: Update local state
           setConnected(false);
           setUserId(null);
+          setSelectedProject(null);
         } else {
           console.error(
             "Jira disconnect failed:",
@@ -205,5 +213,8 @@ export function useSession(): UseSessionReturn {
     // Session management
     handleSessionSwitch,
     handleCreateNewSession,
+
+    selectedProject,
+    setSelectedProject,
   };
 }

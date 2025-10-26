@@ -84,8 +84,6 @@ export function ChatProvider({
     null
   );
 
-  // Store the selected jira project
-  const [selectedProject, setSelectedProject] = useState<string | null>(null);
 
   // Consolidate all hooks
   const {
@@ -96,6 +94,8 @@ export function ChatProvider({
     handleUserIdConfirm,
     handleCreateNewSession,
     handleSessionSwitch,
+    selectedProject,
+    setSelectedProject
   } = useSession();
 
   const {
