@@ -107,8 +107,10 @@ export function useSession(): UseSessionReturn {
         const data: { success: boolean; error?: string } = await res.json();
 
         if (data.success) {
-          // Step 2: Remove from localStorage
+          // Step 2: Remove user-related localStorage items
           localStorage.removeItem("agent-engine-user-id");
+          localStorage.removeItem(`jiraProjects_${userId}`);
+          localStorage.removeItem(`jiraSelectedProject_${userId}`);
 
           // Step 3: Update local state
           setConnected(false);

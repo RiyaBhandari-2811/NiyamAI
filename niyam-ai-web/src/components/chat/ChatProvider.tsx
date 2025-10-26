@@ -54,6 +54,10 @@ export interface ChatContextValue {
   //Uploaded file states
   originalUploadedFile: File | null;
   setOriginalUploadedFile: React.Dispatch<React.SetStateAction<File | null>>;
+
+  //Jira Project
+  selectedProject: string | null;
+  setSelectedProject: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
 interface ChatProviderProps {
@@ -79,6 +83,9 @@ export function ChatProvider({
   const [originalUploadedFile, setOriginalUploadedFile] = useState<File | null>(
     null
   );
+
+  // Store the selected jira project
+  const [selectedProject, setSelectedProject] = useState<string | null>(null);
 
   // Consolidate all hooks
   const {
@@ -388,6 +395,9 @@ export function ChatProvider({
 
     originalUploadedFile,
     setOriginalUploadedFile,
+
+    selectedProject,
+    setSelectedProject,
   };
 
   return (

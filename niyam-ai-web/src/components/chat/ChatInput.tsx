@@ -10,7 +10,13 @@ import { Badge } from "@/components/ui/badge";
 import { useChatContext } from "./ChatProvider";
 
 const ChatInput = () => {
-  const { setOriginalUploadedFile, connected, handleSubmit } = useChatContext();
+  const {
+    setOriginalUploadedFile,
+    connected,
+    handleSubmit,
+    selectedProject,
+    sessionId,
+  } = useChatContext();
   const [dragActive, setDragActive] = React.useState(false);
   const [uploadedFile, setUploadedFile] = React.useState<File | null>(null);
   const [urlInput, setUrlInput] = React.useState("");
@@ -253,7 +259,10 @@ const ChatInput = () => {
           disabled={!connected || (!uploadedFile && !urlInput && !textInput)}
           className={`text-lg transition-all duration-300 cursor-pointer
               ${
-                !connected || (!uploadedFile && !urlInput && !textInput)
+                !connected ||
+                !selectedProject ||
+                !sessionId ||
+                (!uploadedFile && !urlInput && !textInput)
                   ? "opacity-50 cursor-not-allowed"
                   : "hover:bg-slate-600 hover:text-secondary cursor-pointer"
               }`}

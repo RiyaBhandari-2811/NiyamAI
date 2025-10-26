@@ -3,6 +3,7 @@ import JiraAuth from "../jira-auth/JiraAuth";
 import { useChatContext } from "@/components/chat/ChatProvider";
 import { Badge } from "../ui/badge";
 import { SessionSelector } from "./SessionSelector";
+import JiraProjectList from "./JiraProjectList";
 
 /**
  * ChatHeader - User and session management interface
@@ -49,6 +50,8 @@ const ChatHeader = () => {
                 onCreateSession={handleCreateNewSession}
                 className="text-xs"
               />
+
+              <JiraProjectList />
             </>
           )}
 
