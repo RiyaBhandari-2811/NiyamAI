@@ -10,7 +10,13 @@ import { Badge } from "@/components/ui/badge";
 import { useChatContext } from "./ChatProvider";
 
 const ChatInput = () => {
-  const { setOriginalUploadedFile, connected, handleSubmit } = useChatContext();
+  const {
+    setOriginalUploadedFile,
+    connected,
+    handleSubmit,
+    selectedProject,
+    sessionId,
+  } = useChatContext();
   const [dragActive, setDragActive] = React.useState(false);
   const [uploadedFile, setUploadedFile] = React.useState<File | null>(null);
   const [urlInput, setUrlInput] = React.useState("");
@@ -86,14 +92,24 @@ const ChatInput = () => {
 
     if (uploadedFile) {
       const base64 = await fileToBase64(uploadedFile);
-      payload = { type: "file", mime: uploadedFile.type, data: base64 };
+      payload = {
+        type: "file",
+        mime: uploadedFile.type,
+        data: base64 + `Project Key: ${selectedProject}`,
+      };
       setUploadedFile(null);
     } else if (urlInput) {
-      payload = { type: "url", data: urlInput };
+      payload = {
+        type: "url",
+        data: urlInput + `Project Key: ${selectedProject}`,
+      };
       setUrlInput("");
     } else if (textInput) {
       console.log("RIYA TEXT INPUT: ", textInput);
-      payload = { type: "text", data: textInput };
+      payload = {
+        type: "text",
+        data: textInput + `Project Key: ${selectedProject}`,
+      };
       console.log("payload ", payload.data);
       setTextInput("");
     } else {
@@ -253,7 +269,10 @@ const ChatInput = () => {
           disabled={!connected || (!uploadedFile && !urlInput && !textInput)}
           className={`text-lg transition-all duration-300 cursor-pointer
               ${
-                !connected || (!uploadedFile && !urlInput && !textInput)
+                !connected ||
+                !selectedProject ||
+                !sessionId ||
+                (!uploadedFile && !urlInput && !textInput)
                   ? "opacity-50 cursor-not-allowed"
                   : "hover:bg-slate-600 hover:text-secondary cursor-pointer"
               }`}

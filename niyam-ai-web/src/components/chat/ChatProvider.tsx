@@ -54,6 +54,10 @@ export interface ChatContextValue {
   //Uploaded file states
   originalUploadedFile: File | null;
   setOriginalUploadedFile: React.Dispatch<React.SetStateAction<File | null>>;
+
+  //Jira Project
+  selectedProject: string | null;
+  setSelectedProject: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
 interface ChatProviderProps {
@@ -80,6 +84,7 @@ export function ChatProvider({
     null
   );
 
+
   // Consolidate all hooks
   const {
     userId,
@@ -89,6 +94,8 @@ export function ChatProvider({
     handleUserIdConfirm,
     handleCreateNewSession,
     handleSessionSwitch,
+    selectedProject,
+    setSelectedProject
   } = useSession();
 
   const {
@@ -388,6 +395,9 @@ export function ChatProvider({
 
     originalUploadedFile,
     setOriginalUploadedFile,
+
+    selectedProject,
+    setSelectedProject,
   };
 
   return (
