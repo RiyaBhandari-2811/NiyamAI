@@ -4,6 +4,7 @@ import BackendHealthChecker from "@/components/health-check/BackendHealthChecker
 import ChatHeader from "@/components/chat/ChatHeader";
 import ChatContent from "@/components/chat/ChatContent";
 import ChatInput from "@/components/chat/ChatInput";
+import Footer from "../footer/Footer";
 
 /**
  * ChatLayout - Pure layout component for chat interface
@@ -12,24 +13,31 @@ import ChatInput from "@/components/chat/ChatInput";
  */
 export function ChatContainer(): React.JSX.Element {
   return (
-    <div className="h-screen flex flex-col bg-slate-900 relative">
+    <div className="min-h-screen flex flex-col bg-background text-foreground relative">
       <BackendHealthChecker>
-        {/* Fixed background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 pointer-events-none"></div>
+        {/* Background */}
+        <div className="absolute bg-slate-950/40 pointer-events-none"></div>
 
-        {/* Fixed Header - stays at top */}
-        <div className="relative z-10 flex-shrink-0">
+        {/* Sticky Header */}
+        <div className="sticky top-0 z-20 bg-slate-950/40 border-b border-border">
           <ChatHeader />
         </div>
 
-        {/* Scrollable Messages Area - takes remaining space */}
-        <div className="relative z-10 flex-1 min-h-0">
-          <ChatContent />
+        {/* Center ChatContent vertically and horizontally */}
+        <div className="relative z-10 flex flex-col flex-grow  bg-slate-950/40">
+          <div className="flex-grow">
+            <ChatContent />
+          </div>
+
+          {/* Chat Input at bottom */}
+          <div className="flex-shrink-0 bg-slate-950/40">
+            <ChatInput />
+          </div>
         </div>
 
-        {/* Fixed Input Area - always at bottom */}
-        <div className="relative z-10 flex-shrink-0">
-          <ChatInput />
+        {/* Footer */}
+        <div className="relative z-10 bg-popover border-t border-border">
+          <Footer onPrivacyClick={() => {}} />
         </div>
       </BackendHealthChecker>
     </div>
