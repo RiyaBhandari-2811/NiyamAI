@@ -2,6 +2,10 @@
 name = "niyam-ai-adk-fullstack"
 version = "0.1.0"
 description = "Your AI-Powered Healthcare Test Case Generator."
+authors = [
+    {name = "Soham Pathak", email = "sohampathak1234@gmail.com"},
+    {name = "Riya Bhandhari", email = "bhandari28riya@gmail.com"}
+]
 dependencies = [
     "google-adk==1.6.1",
     "python-dotenv",  
