@@ -24,20 +24,20 @@ export function ChatContainer(): React.JSX.Element {
         </div>
 
         {/* Center ChatContent vertically and horizontally */}
-        <div className="relative z-10 flex flex-col flex-grow  bg-slate-950/40">
-          <div className="flex-grow">
+        <div className="relative z-10 flex flex-col grow  bg-slate-950/40">
+          <div className="grow">
             <ChatContent />
           </div>
 
           {/* Chat Input at bottom */}
-          <div className="flex-shrink-0 bg-slate-950/40">
+          <div className="shrink-0 bg-slate-950/40">
             <ChatInput />
           </div>
         </div>
 
         {/* Footer */}
         <div className="relative z-10 bg-popover border-t border-border">
-          <Footer onPrivacyClick={() => {}} />
+          <Footer />
         </div>
       </BackendHealthChecker>
     </div>

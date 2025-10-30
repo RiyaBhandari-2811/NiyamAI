@@ -28,7 +28,7 @@ const BackendHealthChecker: React.FC<BackendHealthCheckerProps> = ({
   // Themed background container for all backend states
   const ThemedContainer = ({ children }: { children: React.ReactNode }) => (
     <div className="min-h-screen flex items-center justify-center bg-slate-900 text-slate-100 transition-colors duration-300">
-      <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 pointer-events-none"></div>
+      <div className="absolute inset-0 bg-linear-to-br from-slate-900 via-slate-800 to-slate-900 pointer-events-none"></div>
       <div className="relative z-10 w-full flex flex-col items-center justify-center px-6 py-10">
         {children}
       </div>
