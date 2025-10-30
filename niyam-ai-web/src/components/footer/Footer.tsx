@@ -1,10 +1,6 @@
 import Link from "next/link";
 
-interface FooterProps {
-  onPrivacyClick: () => void;
-}
-
-const Footer = ({ onPrivacyClick }: FooterProps) => {
+const Footer = () => {
   return (
     <footer className="border-t border-slate-600 bg-slate-950/40 backdrop-blur-sm">
       <div className="container mx-auto px-4 py-8">
@@ -13,27 +9,27 @@ const Footer = ({ onPrivacyClick }: FooterProps) => {
             © {new Date().getFullYear()} Niyam AI. Powered by Google Gemini.
           </div>
           <nav className="flex flex-wrap gap-6 text-sm">
-            <button
-              onClick={onPrivacyClick}
-              className="text-muted-foreground hover:text-primary transition-colors"
+            <Link
+              href="/privacy-policy"
+              className="text-slate-200 hover:text-primary transition- hover:cursor-pointer"
             >
               Privacy Policy
-            </button>
+            </Link>
             <Link
               href="/terms"
-              className="text-slate-200 hover:text-primary transition-colors"
+              className="text-slate-200 hover:text-primary transition- hover:cursor-pointer"
             >
               Terms of Service
             </Link>
             <Link
               href="/cookies"
-              className="text-slate-200 hover:text-primary transition-colors"
+              className="text-slate-200 hover:text-primary transition- hover:cursor-pointer"
             >
               Cookie Policy
             </Link>
             <Link
               href="/data-deletion"
-              className="text-slate-200 hover:text-primary transition-colors"
+              className="text-slate-200 hover:text-primary transition- hover:cursor-pointer"
             >
               Data Deletion
             </Link>

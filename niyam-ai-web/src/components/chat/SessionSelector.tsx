@@ -235,7 +235,7 @@ export function SessionSelector({
                 ))
               ) : (
                 <SelectItem
-                  value=""
+                  value="no-session"
                   disabled
                   className="text-slate-500 cursor-not-allowed py-3 px-3"
                 >

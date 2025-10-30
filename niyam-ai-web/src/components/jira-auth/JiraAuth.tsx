@@ -35,10 +35,7 @@ const JiraAuth = () => {
       return "";
     }
 
-    const redirectUri =
-      process.env.NODE_ENV === "development"
-        ? "http://localhost:3000/api/auth/callback"
-        : "https://niyam-ai-web.vercel.app/api/auth/callback";
+    const redirectUri = "https://niyam-ai-web.vercel.app/api/auth/callback";
 
     const scope = [
       "offline_access",
@@ -110,11 +107,11 @@ const JiraAuth = () => {
         <Button
           disabled={loading || !userId}
           onClick={connected ? handleDisconnect : handleConnect}
-          className={`relative flex items-center justify-center gap-2 w-fit min-w-[180px] h-11 rounded-xl font-medium transition-all duration-300
+          className={`relative flex items-center justify-center gap-2 w-fit min-w-[180px] h-11 rounded-xl font-medium transition-all duration-300 hover:cursor-pointer
             ${
               connected
-                ? "bg-gradient-to-br from-red-500 to-red-600 text-white hover:from-red-600 hover:to-red-700 shadow-md shadow-red-900/20"
-                : "bg-gradient-to-br from-emerald-500 to-emerald-600 text-white hover:from-emerald-600 hover:to-emerald-700 shadow-md shadow-emerald-900/20"
+                ? "bg-linear-to-br` from-red-500 to-red-600 text-white hover:from-red-600 hover:to-red-700 shadow-md shadow-red-900/20"
+                : "bg-linear-to-br` from-emerald-500 to-emerald-600 text-white hover:from-emerald-600 hover:to-emerald-700 shadow-md shadow-emerald-900/20"
             }
             ${loading || !userId ? "opacity-50 cursor-not-allowed" : ""}
           `}
@@ -141,7 +138,7 @@ const JiraAuth = () => {
           <ScrollArea className="h-[60vh] pr-3">
             <div className="space-y-4 text-sm text-muted-foreground">
               <p>
-                <strong>Effective Date:</strong> [Insert date]
+                <strong>Effective Date:</strong> {new Date().toLocaleDateString('en-GB')}
               </p>
 
               <p>
@@ -225,9 +222,9 @@ const JiraAuth = () => {
               <p>
                 For data or privacy inquiries, contact:
                 <br />
-                <strong>Email:</strong> privacy@[yourdomain].com
+                <strong>Email:</strong> privacy@[niyamai].com
                 <br />
-                <strong>Address:</strong> [Your company or name, City, Country]
+                <strong>Address:</strong> [Niyam-ai, Pune, India]
               </p>
             </div>
           </ScrollArea>
