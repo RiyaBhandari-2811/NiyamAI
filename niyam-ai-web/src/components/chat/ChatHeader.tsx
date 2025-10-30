@@ -20,11 +20,11 @@ const ChatHeader = () => {
   } = useChatContext();
 
   return (
-    <div className="relative z-10 flex-shrink-0 border-b border-border bg-background/80 backdrop-blur-sm">
+    <div className="relative z-10 shrink-0 border-b border-border bg-background/80 backdrop-blur-sm">
       <div className="flex justify-between items-center p-6">
         {/* Left side - App branding */}
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-gradient-to-br from-[hsl(142_76%_45%)] to-[hsl(142_76%_35%)] rounded-full flex items-center justify-center shadow-md">
+          <div className="w-8 h-8 bg-linear-to-br from-[hsl(142_76%_45%)] to-[hsl(142_76%_35%)] rounded-full flex items-center justify-center shadow-md">
             <Bot className="h-4 w-4 text-[hsl(220_25%_10%)]" />
           </div>
           <div>

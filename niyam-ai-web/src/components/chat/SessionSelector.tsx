@@ -221,7 +221,7 @@ export function SessionSelector({
                         {session.title}
                       </span>
                       <div className="flex items-center gap-2 text-xs text-slate-400 mt-1">
-                        <Calendar className="w-3 h-3 flex-shrink-0" />
+                        <Calendar className="w-3 h-3 shrink-0" />
                         <span>{formatDate(session.lastActivity)}</span>
                         {session.messageCount !== undefined && (
                           <>
