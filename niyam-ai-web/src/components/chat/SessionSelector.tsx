@@ -8,13 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  MessageSquare,
-  Calendar,
-  Loader2,
-  Plus,
-  AlertCircle,
-} from "lucide-react";
+import { Calendar, Loader2, Plus, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import { fetchActiveSessionsAction } from "@/lib/actions/session-list-actions";
 
@@ -46,66 +40,39 @@ export function SessionSelector({
   const [isLoadingSessions, setIsLoadingSessions] = useState<boolean>(false);
   const [sessionError, setSessionError] = useState<string | null>(null);
 
-  // Fetch active sessions from ADK backend
+  // Fetch active sessions
   const fetchActiveSessions = useCallback(
     async (userId: string) => {
       try {
         setIsLoadingSessions(true);
         setSessionError(null);
 
-        console.log(
-          "🔄 [SESSION_SELECTOR] Fetching active sessions for user:",
-          userId
-        );
-
         const result = await fetchActiveSessionsAction(userId);
-
         if (result.success) {
-          console.log("✅ [SESSION_SELECTOR] Active sessions fetched:", {
-            sessionsCount: result.sessions.length,
-          });
-
-          // Convert ADK sessions to Session format
           const activeSessions: Session[] = result.sessions.map((session) => ({
             id: session.id,
             userId: session.userId,
             lastActivity: session.lastUpdateTime || new Date(),
             title: session.title || `Session ${session.id.substring(0, 8)}`,
-            messageCount: session.messageCount, // Now using real message count from backend
+            messageCount: session.messageCount,
           }));
 
-          // Sort by last activity (most recent first)
           activeSessions.sort(
             (a, b) => b.lastActivity.getTime() - a.lastActivity.getTime()
           );
 
           setSessions(activeSessions);
-          console.log("✅ [SESSION_SELECTOR] Sessions updated in state:", {
-            sessionsCount: activeSessions.length,
-            sessionIds: activeSessions.map((s) => s.id.substring(0, 8)),
-            currentSessionId: currentSessionId?.substring(0, 8),
-          });
         } else {
-          console.error(
-            "❌ [SESSION_SELECTOR] Failed to fetch sessions:",
-            result.error
-          );
           const errorMessage = result.error || "Failed to fetch sessions";
           setSessionError(errorMessage);
           setSessions([]);
-
-          // Show error toast to user
           toast.error("Failed to load sessions", {
             description: errorMessage,
           });
         }
       } catch (error) {
-        console.error("❌ [SESSION_SELECTOR] Error fetching sessions:", error);
-        const errorMessage = "Network error while fetching sessions";
-        setSessionError(errorMessage);
+        setSessionError("Network error while fetching sessions");
         setSessions([]);
-
-        // Show error toast to user
         toast.error("Network error", {
           description:
             "Could not connect to load your sessions. Please try again.",
@@ -117,7 +84,6 @@ export function SessionSelector({
     [currentSessionId]
   );
 
-  // Load sessions when user ID changes
   useEffect(() => {
     if (currentUserId) {
       fetchActiveSessions(currentUserId);
@@ -127,35 +93,15 @@ export function SessionSelector({
     }
   }, [currentUserId, fetchActiveSessions]);
 
-  // Add current session to list if it doesn't exist (for newly created sessions)
+  // Add current session if missing
   useEffect(() => {
-    console.log("🔄 [SESSION_SELECTOR] Current session changed:", {
-      currentSessionId: currentSessionId?.substring(0, 8),
-      currentUserId,
-      hasSessionId: !!currentSessionId,
-      hasUserId: !!currentUserId,
-    });
-
     if (currentSessionId && currentUserId) {
-      // Use a timeout to ensure this runs after sessions have been set
       const timeoutId = setTimeout(() => {
         setSessions((prevSessions) => {
           const sessionExists = prevSessions.some(
             (s) => s.id === currentSessionId
           );
-
-          console.log("🔍 [SESSION_SELECTOR] Checking if session exists:", {
-            currentSessionId: currentSessionId.substring(0, 8),
-            sessionExists,
-            prevSessionsCount: prevSessions.length,
-            prevSessionIds: prevSessions.map((s) => s.id.substring(0, 8)),
-          });
-
           if (!sessionExists) {
-            console.log(
-              "➕ [SESSION_SELECTOR] Adding current session to list:",
-              currentSessionId.substring(0, 8)
-            );
             const newSession: Session = {
               id: currentSessionId,
               userId: currentUserId,
@@ -165,32 +111,20 @@ export function SessionSelector({
             };
             return [newSession, ...prevSessions];
           }
-
           return prevSessions;
         });
-      }, 100); // Small delay to ensure proper timing
-
+      }, 100);
       return () => clearTimeout(timeoutId);
     }
-  }, [currentSessionId, currentUserId]); // Removed sessions dependency to avoid circular updates
+  }, [currentSessionId, currentUserId]);
 
-  // Handle session selection or creation
   const handleSessionSelect = async (value: string): Promise<void> => {
     if (value === "create-new") {
-      // Create new session
       setIsCreatingSession(true);
       try {
         await onCreateSession(currentUserId);
-
-        // Refresh session list after creation to ensure it appears
-        console.log("🔄 [SESSION_SELECTOR] Refreshing sessions after creation");
-        setTimeout(() => {
-          fetchActiveSessions(currentUserId);
-        }, 500); // Small delay to allow backend to process
-      } catch (error) {
-        console.error("Failed to create session:", error);
-
-        // Show error toast to user
+        setTimeout(() => fetchActiveSessions(currentUserId), 500);
+      } catch {
         toast.error("Failed to create session", {
           description: "Could not create a new session. Please try again.",
         });
@@ -198,117 +132,143 @@ export function SessionSelector({
         setIsCreatingSession(false);
       }
     } else {
-      // Select existing session
       onSessionSelect(value);
     }
   };
 
-  // Format date for display
   const formatDate = (date: Date): string => {
     const now = new Date();
     const diffMinutes = Math.floor(
       (now.getTime() - date.getTime()) / (1000 * 60)
     );
-
     if (diffMinutes < 1) return "Just now";
     if (diffMinutes < 60) return `${diffMinutes}m ago`;
-
     const diffHours = Math.floor(diffMinutes / 60);
     if (diffHours < 24) return `${diffHours}h ago`;
-
     const diffDays = Math.floor(diffHours / 24);
     if (diffDays < 7) return `${diffDays}d ago`;
-
     return date.toLocaleDateString();
   };
 
   return (
-    <div className={`${className}`}>
-      <div className="flex items-center gap-2">
-        <span className="text-sm text-slate-400">Session:</span>
-        <Select value={currentSessionId} onValueChange={handleSessionSelect}>
-          <SelectTrigger className="w-44 h-12 text-xs bg-slate-700/50 border-slate-600/50 text-slate-100 hover:bg-slate-600/50 focus:border-emerald-500 px-4 py-1">
-            <SelectValue
-              placeholder={
-                isLoadingSessions
-                  ? "Loading sessions..."
-                  : sessionError
-                  ? "Error loading sessions"
-                  : sessions.length === 0
-                  ? "Create your first session"
-                  : "Select session"
-              }
-            />
-          </SelectTrigger>
-          <SelectContent className="bg-slate-800 border-slate-600 min-w-44">
-            {/* Loading state */}
-            {isLoadingSessions && (
-              <div className="flex items-center gap-2 p-3 text-slate-400">
-                <Loader2 className="w-4 h-4 animate-spin" />
-                <span className="text-sm">Loading active sessions...</span>
-              </div>
-            )}
+    <div className={`flex items-center gap-3 ${className}`}>
+      <span className="text-sm text-slate-400 whitespace-nowrap">
+        Session List:
+      </span>
 
-            {/* Error state */}
-            {sessionError && !isLoadingSessions && (
-              <div className="flex items-center gap-2 p-3 text-red-400">
-                <AlertCircle className="w-4 h-4" />
-                <span className="text-sm">Failed to load sessions</span>
-              </div>
-            )}
+      <Select value={currentSessionId} onValueChange={handleSessionSelect}>
+        <SelectTrigger
+          className={`
+            w-52 h-11 text-sm
+            bg-slate-900/70 border border-slate-700
+            text-slate-100 rounded-xl
+            transition-all duration-300 ease-in-out
+            hover:border-emerald-500 focus:border-emerald-500
+            hover:shadow-[0_0_12px_rgba(16,185,129,0.3)]
+            focus:shadow-[0_0_14px_rgba(16,185,129,0.4)]
+            px-4
+          `}
+        >
+          <SelectValue
+            placeholder={
+              isLoadingSessions
+                ? "Loading sessions..."
+                : sessionError
+                ? "Error loading sessions"
+                : sessions.length === 0
+                ? "Create your first session"
+                : "Select session"
+            }
+          />
+        </SelectTrigger>
 
-            {/* Sessions list */}
-            {!isLoadingSessions && !sessionError && (
-              <>
-                {sessions.map((session) => (
+        <SelectContent
+          className={`
+            bg-slate-900 border border-slate-700 
+            rounded-xl shadow-lg min-w-52 backdrop-blur-md
+          `}
+        >
+          {isLoadingSessions && (
+            <div className="flex items-center gap-2 p-3 text-slate-400">
+              <Loader2 className="w-4 h-4 animate-spin" />
+              <span className="text-sm">Loading sessions...</span>
+            </div>
+          )}
+
+          {sessionError && !isLoadingSessions && (
+            <div className="flex items-center gap-2 p-3 text-red-400">
+              <AlertCircle className="w-4 h-4" />
+              <span className="text-sm">{sessionError}</span>
+            </div>
+          )}
+
+          {!isLoadingSessions && !sessionError && (
+            <>
+              {sessions.length > 0 ? (
+                sessions.map((session) => (
                   <SelectItem
                     key={session.id}
                     value={session.id}
-                    className="text-slate-100 focus:bg-slate-700 focus:text-slate-50 cursor-pointer py-3 px-3"
+                    className={`
+                      text-slate-100 py-3 px-3 cursor-pointer rounded-lg
+                      transition-all duration-200
+                      focus:bg-slate-800 hover:bg-slate-800
+                      focus:text-emerald-400 hover:text-emerald-400
+                    `}
                   >
                     <div className="flex flex-col items-start w-full min-w-0">
-                      <span className="font-medium text-slate-100 text-sm truncate w-full">
+                      <span className="font-medium text-sm truncate w-full">
                         {session.title}
                       </span>
-                      <div className="flex items-center gap-2 text-xs text-slate-300 mt-1">
-                        <Calendar className="w-3 h-3 flex-shrink-0" />
-                        <span className="flex-shrink-0">
-                          {formatDate(session.lastActivity)}
-                        </span>
+                      <div className="flex items-center gap-2 text-xs text-slate-400 mt-1">
+                        <Calendar className="w-3 h-3 shrink-0" />
+                        <span>{formatDate(session.lastActivity)}</span>
                         {session.messageCount !== undefined && (
                           <>
-                            <span className="text-slate-500">•</span>
-                            <span className="flex-shrink-0">
-                              {session.messageCount} msg
-                            </span>
+                            <span className="text-slate-600">•</span>
+                            <span>{session.messageCount} msg</span>
                           </>
                         )}
                       </div>
                     </div>
                   </SelectItem>
-                ))}
-                {/* Create New Session Option */}
+                ))
+              ) : (
                 <SelectItem
-                  value="create-new"
-                  className="text-slate-100 focus:bg-slate-700 focus:text-slate-50 border-t border-slate-600 mt-1 cursor-pointer py-3 px-3"
-                  disabled={isCreatingSession}
+                  value="no-session"
+                  disabled
+                  className="text-slate-500 cursor-not-allowed py-3 px-3"
                 >
-                  <div className="flex items-center gap-2">
-                    {isCreatingSession ? (
-                      <Loader2 className="w-4 h-4 animate-spin text-emerald-400 flex-shrink-0" />
-                    ) : (
-                      <Plus className="w-4 h-4 text-emerald-400 flex-shrink-0" />
-                    )}
-                    <span className="text-emerald-400 font-medium">
-                      {isCreatingSession ? "Creating..." : "Create New Session"}
-                    </span>
-                  </div>
+                  <span className="text-slate-400 text-sm">
+                    No active sessions
+                  </span>
                 </SelectItem>
-              </>
-            )}
-          </SelectContent>
-        </Select>
-      </div>
+              )}
+
+              <SelectItem
+                value="create-new"
+                disabled={isCreatingSession}
+                className={`
+                  py-3 px-3 mt-1 border-t border-slate-700/60
+                  hover:bg-emerald-500/10 focus:bg-emerald-500/10
+                  text-emerald-400 transition-all duration-200
+                `}
+              >
+                <div className="flex items-center gap-2">
+                  {isCreatingSession ? (
+                    <Loader2 className="w-4 h-4 animate-spin text-emerald-400" />
+                  ) : (
+                    <Plus className="w-4 h-4 text-emerald-400" />
+                  )}
+                  <span className="font-medium">
+                    {isCreatingSession ? "Creating..." : "Create New Session"}
+                  </span>
+                </div>
+              </SelectItem>
+            </>
+          )}
+        </SelectContent>
+      </Select>
     </div>
   );
 }

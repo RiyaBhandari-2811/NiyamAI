@@ -9,8 +9,8 @@ interface BackendHealthCheckerProps {
 }
 
 /**
- * Backend health monitoring component that displays appropriate states
- * Uses the useBackendHealth hook for monitoring and retry logic
+ * Backend health monitoring wrapper
+ * Displays a themed loading or error state until backend is ready
  */
 const BackendHealthChecker: React.FC<BackendHealthCheckerProps> = ({
   onHealthStatusChange,
@@ -19,24 +19,38 @@ const BackendHealthChecker: React.FC<BackendHealthCheckerProps> = ({
   const { isBackendReady, isCheckingBackend, checkBackendHealth } =
     useBackendHealth();
 
-  // Notify parent of health status changes
   React.useEffect(() => {
     if (onHealthStatusChange) {
       onHealthStatusChange(isBackendReady, isCheckingBackend);
     }
   }, [isBackendReady, isCheckingBackend, onHealthStatusChange]);
 
-  // Show loading screen while checking backend
+  // Themed background container for all backend states
+  const ThemedContainer = ({ children }: { children: React.ReactNode }) => (
+    <div className="min-h-screen flex items-center justify-center bg-slate-900 text-slate-100 transition-colors duration-300">
+      <div className="absolute inset-0 bg-linear-to-br from-slate-900 via-slate-800 to-slate-900 pointer-events-none"></div>
+      <div className="relative z-10 w-full flex flex-col items-center justify-center px-6 py-10">
+        {children}
+      </div>
+    </div>
+  );
+
   if (isCheckingBackend) {
-    return <BackendLoadingScreen />;
+    return (
+      <ThemedContainer>
+        <BackendLoadingScreen />
+      </ThemedContainer>
+    );
   }
 
-  // Show error screen if backend is not ready
   if (!isBackendReady) {
-    return <BackendErrorScreen onRetry={checkBackendHealth} />;
+    return (
+      <ThemedContainer>
+        <BackendErrorScreen onRetry={checkBackendHealth} />
+      </ThemedContainer>
+    );
   }
 
-  // Render children if backend is ready
   return <>{children}</>;
 };
 

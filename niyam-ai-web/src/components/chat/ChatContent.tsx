@@ -7,14 +7,19 @@ import { useChatContext } from "@/components/chat/ChatProvider";
 /**
  * ChatContent - Conditional rendering container
  * Shows EmptyState when no messages exist, MessageArea when messages are present
- * Handles the conditional logic that was in ChatMessagesView
  */
 export default function ChatContent(): React.JSX.Element {
   const { messages } = useChatContext();
 
+  const isEmpty = messages.length === 0;
+
   return (
-    <div className={`h-full ${messages.length === 0 ? "flex" : ""}`}>
-      {messages.length === 0 ? <EmptyState /> : <MessageArea />}
+    <div
+      className={`h-full w-full bg-slate-950/40 pt-10 ${
+        isEmpty ? "flex items-center justify-center" : ""
+      }`}
+    >
+      {isEmpty ? <EmptyState /> : <MessageArea />}
     </div>
   );
 }
