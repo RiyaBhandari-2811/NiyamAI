@@ -37,8 +37,7 @@ export async function GET(request: Request) {
 
     // If decryption succeeds, user is connected
     return NextResponse.json({
-      connected: jiraData.connected ?? false,
-      jira: decryptedJira,
+      connected: decryptedJira.connected ?? false
     });
   } catch (error) {
     console.error("Error fetching Jira connection:", error);
