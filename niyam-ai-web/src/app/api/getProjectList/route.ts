@@ -1,5 +1,8 @@
 import { db } from "@/config/firebaseAdmin";
 import { NextResponse } from "next/server";
+import { getAesKey } from "@/config/getGoogleSecret";
+import { decryptObject } from "@/lib/utils";
+import crypto from "crypto";
 
 export async function GET(req: Request) {
   try {
@@ -25,14 +28,35 @@ export async function GET(req: Request) {
     }
 
     const data = snapshot.data();
-    console.log("[JiraProjectsAPI] Firestore document data:", data);
+    const jiraData = data?.jira;
 
-    const accessToken = data?.jira?.accessToken;
-    const cloudId = data?.jira?.cloudId;
+    if (!jiraData || !jiraData.data || !jiraData.iv) {
+      console.warn(`[JiraProjectsAPI] Missing encrypted Jira data for userId ${userId}`);
+      return NextResponse.json(
+        { error: "Missing encrypted Jira data" },
+        { status: 400 }
+      );
+    }
 
+    // 2. Decrypt Jira credentials
+    const aesKeyBuffer : any = await getAesKey();
+    const key = Buffer.from(aesKeyBuffer, "base64");
+
+    let decryptedJira;
+    try {
+      decryptedJira = decryptObject(jiraData.data, jiraData.iv, key);
+    } catch (err) {
+      console.error("[JiraProjectsAPI] Failed to decrypt Jira data:", err);
+      return NextResponse.json(
+        { error: "Failed to decrypt Jira credentials" },
+        { status: 500 }
+      );
+    }
+
+    const { accessToken, cloudId } = decryptedJira;
     if (!accessToken || !cloudId) {
       console.warn(
-        `[JiraProjectsAPI] Missing Jira credentials for userId ${userId}. accessToken: ${!!accessToken}, cloudId: ${!!cloudId}`
+        `[JiraProjectsAPI] Missing Jira credentials after decryption for userId ${userId}`
       );
       return NextResponse.json(
         { error: "Missing Jira credentials" },
@@ -40,7 +64,7 @@ export async function GET(req: Request) {
       );
     }
 
-    // 2. Call Jira REST API to fetch project list
+    // 3. Call Jira REST API
     console.log(`[JiraProjectsAPI] Calling Jira API for cloudId ${cloudId}`);
     const jiraResponse = await fetch(
       `https://api.atlassian.com/ex/jira/${cloudId}/rest/api/3/project/search`,
@@ -62,10 +86,10 @@ export async function GET(req: Request) {
       );
     }
 
-    const jiraData = await jiraResponse.json();
-    console.log("[JiraProjectsAPI] Jira API response:", jiraData.values);
+    const jiraDataResponse = await jiraResponse.json();
+    console.log("[JiraProjectsAPI] Jira API response:", jiraDataResponse.values);
 
-    return NextResponse.json(jiraData.values || []);
+    return NextResponse.json(jiraDataResponse.values || []);
   } catch (error) {
     console.error("[JiraProjectsAPI] Internal error:", error);
     return NextResponse.json(
