@@ -1,6 +1,10 @@
 import { SecretManagerServiceClient } from "@google-cloud/secret-manager";
 
-const credentials = JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON as string);
+const jsonString = process.env.GOOGLE_SERVICE_ACCOUNT_JSON?.replace(
+  /\n/g,
+  "\\n"
+) as string;
+const credentials = JSON.parse(jsonString);
 const client = new SecretManagerServiceClient({ credentials });
 
 export async function getAesKey() {

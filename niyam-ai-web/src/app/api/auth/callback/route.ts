@@ -68,8 +68,6 @@ export async function GET(request: Request) {
     // Step 3: Encrypt and store in Firestore
     const aesKey = await getAesKey();
 
-    console.log("Key ::", aesKey);
-
     const jiraObject = {
       accessToken: tokenData.access_token,
       refreshToken: tokenData.refresh_token,
@@ -81,8 +79,6 @@ export async function GET(request: Request) {
 
     // Encrypt the entire Jira object
     const encryptedJira = encryptObject(jiraObject, aesKey);
-
-    console.log("encryptedJira: ", encryptedJira);
 
     // Save encrypted Jira data
     await db

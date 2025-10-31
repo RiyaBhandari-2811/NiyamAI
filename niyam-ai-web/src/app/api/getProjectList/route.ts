@@ -2,7 +2,6 @@ import { db } from "@/config/firebaseAdmin";
 import { NextResponse } from "next/server";
 import { getAesKey } from "@/config/getGoogleSecret";
 import { decryptObject } from "@/lib/utils";
-import crypto from "crypto";
 
 export async function GET(req: Request) {
   try {

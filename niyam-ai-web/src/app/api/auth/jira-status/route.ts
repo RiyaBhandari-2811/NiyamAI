@@ -6,9 +6,7 @@ import { decryptObject } from "@/lib/utils";
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const userId = searchParams.get("userId");
-
-    console.log("jira-status userID: " + userId);
+    const userId = searchParams.get("userId") as string;
 
     if (!userId) {
       return NextResponse.json({ error: "Missing userId" }, { status: 400 });
@@ -17,7 +15,7 @@ export async function GET(request: Request) {
     const doc = await db.collection("users").doc(userId).get();
 
     if (!doc.exists) {
-      console.log("Doc not present in DB")
+      console.log("Doc not present in DB");
       return NextResponse.json({ connected: false }, { status: 200 });
     }
 
@@ -33,11 +31,9 @@ export async function GET(request: Request) {
     // Decrypt the stored Jira data
     const decryptedJira = decryptObject(jiraData.data, jiraData.iv, key);
 
-    console.log("decryptedJira: ", decryptedJira);
-
     // If decryption succeeds, user is connected
     return NextResponse.json({
-      connected: decryptedJira.connected ?? false
+      connected: decryptedJira.connected ?? false,
     });
   } catch (error) {
     console.error("Error fetching Jira connection:", error);
