@@ -8,7 +8,9 @@ authors = [
 ]
 dependencies = [
     "google-adk==1.6.1",
-    "python-dotenv",  
+    "google-cloud-firestore>=2.21.0",
+    "pycryptodome>=3.23.0",
+    "python-dotenv",
 ]
 
 requires-python = ">=3.10,<3.13"
