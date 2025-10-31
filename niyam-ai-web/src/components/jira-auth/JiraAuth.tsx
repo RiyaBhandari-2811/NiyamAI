@@ -99,7 +99,7 @@ const JiraAuth = () => {
     if (userId && !connected) {
       handleUserIdConfirm(userId);
     }
-  }, [userId, connected]);
+  }, [userId, connected, handleUserIdConfirm]);
 
   return (
     <>
