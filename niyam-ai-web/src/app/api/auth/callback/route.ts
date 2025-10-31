@@ -1,5 +1,7 @@
 import { db } from "@/config/firebaseAdmin";
 import { NextResponse } from "next/server";
+import { getAesKey } from "@/config/getGoogleSecret";
+import { encryptObject } from "@/lib/utils";
 
 export async function GET(request: Request) {
   try {
@@ -63,19 +65,34 @@ export async function GET(request: Request) {
       );
     }
 
-    // Step 3: Store in Firestore
+    // Step 3: Encrypt and store in Firestore
+    const aesKey = await getAesKey();
+
+    console.log("Key ::", aesKey);
+
+    const jiraObject = {
+      accessToken: tokenData.access_token,
+      refreshToken: tokenData.refresh_token,
+      cloudId,
+      expiresAt: Date.now() + tokenData.expires_in * 1000,
+      scope: tokenData.scope,
+      connected: true,
+    };
+
+    // Encrypt the entire Jira object
+    const encryptedJira = encryptObject(jiraObject, aesKey);
+
+    console.log("encryptedJira: ", encryptedJira);
+
+    // Save encrypted Jira data
     await db
       .collection("users")
       .doc(state)
       .set(
         {
           jira: {
-            accessToken: tokenData.access_token,
-            refreshToken: tokenData.refresh_token,
-            cloudId,
-            expiresAt: Date.now() + tokenData.expires_in * 1000,
-            scope: tokenData.scope,
-            connected: true,
+            data: encryptedJira.data, // AES-256 encrypted payload
+            iv: encryptedJira.iv, // initialization vector for decryption
           },
         },
         { merge: true }

@@ -77,15 +77,23 @@ export default function PrivacyPolicyPage() {
               <h2 className="text-2xl font-semibold mb-4">3. Data Security</h2>
               <ul className="list-disc ml-5 space-y-1">
                 <li>
-                  Your OAuth tokens are encrypted using AES-256 before being
-                  stored in Google Cloud Firestore.
+                  Your OAuth tokens are encrypted using AES-256-CBC with a
+                  unique initialization vector (IV) before being stored in
+                  Google Cloud Firestore.
                 </li>
-                <li>Decrypted only in memory during active Jira operations.</li>
-                <li>Permanently deleted upon disconnect.</li>
+                <li>
+                  Tokens are decrypted only in memory during authorized Jira
+                  operations and never written to disk.
+                </li>
+                <li>
+                  All stored credentials are permanently deleted upon
+                  disconnection or account removal.
+                </li>
               </ul>
               <p>
-                All services are hosted in Google Cloud (GCP) which is ISO/IEC
-                27001, SOC 2, and GDPR compliant.
+                Our infrastructure is fully hosted on Google Cloud Platform
+                (GCP), which complies with ISO/IEC 27001, SOC 2, and GDPR
+                standards for data protection and security.
               </p>
             </section>
 
