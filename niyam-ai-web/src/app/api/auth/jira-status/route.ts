@@ -2,12 +2,13 @@ import { db } from "@/config/firebaseAdmin";
 import { NextResponse } from "next/server";
 import { getAesKey } from "@/config/getGoogleSecret";
 import { decryptObject } from "@/lib/utils";
-import crypto from "crypto";
 
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get("userId");
+
+    console.log("jira-status userID: " + userId);
 
     if (!userId) {
       return NextResponse.json({ error: "Missing userId" }, { status: 400 });
@@ -16,6 +17,7 @@ export async function GET(request: Request) {
     const doc = await db.collection("users").doc(userId).get();
 
     if (!doc.exists) {
+      console.log("Doc not present in DB")
       return NextResponse.json({ connected: false }, { status: 200 });
     }
 
@@ -30,6 +32,8 @@ export async function GET(request: Request) {
 
     // Decrypt the stored Jira data
     const decryptedJira = decryptObject(jiraData.data, jiraData.iv, key);
+
+    console.log("decryptedJira: ", decryptedJira);
 
     // If decryption succeeds, user is connected
     return NextResponse.json({
