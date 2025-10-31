@@ -127,7 +127,7 @@ export function MessageItem({
           )}
         </div>
 
-        <div className="flex-shrink-0 w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center shadow-md border border-blue-500/30">
+        <div className="shrink-0 w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center shadow-md border border-blue-500/30">
           <User className="h-4 w-4 text-white" />
         </div>
       </div>
@@ -145,11 +145,11 @@ export function MessageItem({
   if (isLoading && hasTimelineEvents) {
     return (
       <div className="flex items-start gap-3 max-w-[90%]">
-        <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-full flex items-center justify-center shadow-md border border-emerald-400/30">
+        <div className="shrink-0 w-8 h-8 bg-linear-to-br from-emerald-500 to-emerald-600 rounded-full flex items-center justify-center shadow-md border border-emerald-400/30">
           <Bot className="h-4 w-4 text-white" />
         </div>
 
-        <div className="flex-1 bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700/50 rounded-2xl rounded-tl-sm p-4 shadow-lg">
+        <div className="flex-1 bg-linear-to-br from-slate-800 to-slate-900 border border-slate-700/50 rounded-2xl rounded-tl-sm p-4 shadow-lg">
           {/* Activity Timeline during thinking */}
           {hasTimelineEvents && (
             <ActivityTimeline
@@ -185,11 +185,11 @@ export function MessageItem({
     if (hasTimelineEvents) {
       return (
         <div className="flex items-start gap-3 max-w-[90%]">
-          <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-full flex items-center justify-center shadow-md border border-emerald-400/30">
+          <div className="shrink-0 w-8 h-8 bg-linear-to-br from-emerald-500 to-emerald-600 rounded-full flex items-center justify-center shadow-md border border-emerald-400/30">
             <Bot className="h-4 w-4 text-white" />
           </div>
 
-          <div className="flex-1 bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700/50 rounded-2xl rounded-tl-sm p-4 shadow-lg">
+          <div className="flex-1 bg-linear-to-br from-slate-800 to-slate-900 border border-slate-700/50 rounded-2xl rounded-tl-sm p-4 shadow-lg">
             <ActivityTimeline
               processedEvents={messageEvents.get(message.id) || []}
               isLoading={isLoading}
@@ -207,7 +207,7 @@ export function MessageItem({
     // Otherwise show no content indicator
     return (
       <div className="flex items-start gap-3 max-w-[90%]">
-        <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-full flex items-center justify-center shadow-md border border-emerald-400/30">
+        <div className="shrink-0 w-8 h-8 bg-linear-to-br from-emerald-500 to-emerald-600 rounded-full flex items-center justify-center shadow-md border border-emerald-400/30">
           <Bot className="h-4 w-4 text-white" />
         </div>
         <div className="flex items-center gap-2 bg-slate-800/50 border border-slate-700/50 rounded-lg px-3 py-2">
@@ -220,11 +220,11 @@ export function MessageItem({
   // Regular AI message display with content
   return (
     <div className="flex items-start gap-3 max-w-[90%]">
-      <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-full flex items-center justify-center shadow-md border border-emerald-400/30">
+      <div className="shrink-0 w-8 h-8 bg-linear-to-br from-emerald-500 to-emerald-600 rounded-full flex items-center justify-center shadow-md border border-emerald-400/30">
         <Bot className="h-4 w-4 text-white" />
       </div>
 
-      <div className="flex-1 bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700/50 rounded-2xl rounded-tl-sm p-4 shadow-lg relative group">
+      <div className="flex-1 bg-linear-to-br from-slate-800 to-slate-900 border border-slate-700/50 rounded-2xl rounded-tl-sm p-4 shadow-lg relative group">
         {/* Activity Timeline */}
         {messageEvents && messageEvents.has(message.id) && (
           <ActivityTimeline
