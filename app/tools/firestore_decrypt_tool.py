@@ -58,5 +58,11 @@ class FirestoreDecryptTool:
         print("DEBUG: IV run:", iv_b64 is not None)
         key = self._get_key_bytes()
         print("DEBUG: Key loaded:", bool(key))
+        decrypted = decrypt_object(encrypted_b64, iv_b64, key)
+        if decrypted is None:
+            print("DEBUG: decrypt_object returned None")
+        else:
+            print(f"DEBUG: decrypt_object returned type={type(decrypted).__name__}")
+        print(json.dumps(decrypted, indent=2))
         return decrypt_object(encrypted_b64, iv_b64, key)
     
