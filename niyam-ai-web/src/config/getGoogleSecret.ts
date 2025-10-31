@@ -1,9 +1,14 @@
 import { SecretManagerServiceClient } from "@google-cloud/secret-manager";
 
-const jsonString = process.env.GOOGLE_SERVICE_ACCOUNT_JSON?.replace(
+
+if (!process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON) {
+  throw new Error("Missing GOOGLE_APPLICATION_CREDENTIALS_JSON environment variable");
+}
+
+const jsonString = process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON.replace(
   /\n/g,
   "\\n"
-) as string;
+);
 const credentials = JSON.parse(jsonString);
 const client = new SecretManagerServiceClient({ credentials });
 
