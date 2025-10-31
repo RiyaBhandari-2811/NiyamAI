@@ -95,7 +95,7 @@ export class StreamingConnectionManager {
       //   messagePayload = { parts: [{ text: payload.data }] };
       // }
 
-      var messagePayload: any = {};
+      let messagePayload: any = {};
 
       switch (payload.type) {
         case "text":
@@ -134,7 +134,7 @@ export class StreamingConnectionManager {
           break;
       }
 
-      let apiPayloadWithData = {
+      const apiPayloadWithData = {
         userId: apiPayload.userId,
         sessionId: apiPayload.sessionId,
         message: messagePayload,

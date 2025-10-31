@@ -75,13 +75,13 @@ export function SessionSelector({
         setSessions([]);
         toast.error("Network error", {
           description:
-            "Could not connect to load your sessions. Please try again.",
+            "Could not connect to load your sessions. Please try again.: " + error,
         });
       } finally {
         setIsLoadingSessions(false);
       }
     },
-    [currentSessionId]
+    []
   );
 
   useEffect(() => {

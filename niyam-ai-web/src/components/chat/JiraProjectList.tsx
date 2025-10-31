@@ -67,7 +67,7 @@ const JiraProjectList = () => {
 
   useEffect(() => {
     if (userId) fetchProjects(userId);
-  }, [userId]);
+  }, [userId, fetchProjects]);
 
   return (
     <div className="w-full flex items-center gap-3">

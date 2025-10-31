@@ -6,7 +6,6 @@
  */
 
 import { NextRequest } from "next/server";
-import { json } from "stream/consumers";
 
 /**
  * Gets the ADK app name from environment or defaults
@@ -200,6 +199,7 @@ export function formatAgentEnginePayload(
     }
   } catch (e) {
     // fallback for plain text
+    console.error(" Error: ", e);
     messagePayload = { parts: [{ text: requestData.message }] };
   }
 
@@ -275,7 +275,10 @@ export function formatLocalBackendPayload(
   };
 
   console.group("[formatLocalBackendPayload] Input Debug");
-  console.log("➡️ Raw requestData.message:", safeStringify(requestData.message));
+  console.log(
+    "➡️ Raw requestData.message:",
+    safeStringify(requestData.message)
+  );
   console.groupEnd();
 
   try {
@@ -364,7 +367,6 @@ export function formatLocalBackendPayload(
   return finalPayload;
 }
 
-
 /**
  * Centralized logging for stream operations
  *
@@ -379,8 +381,6 @@ export function logStreamRequest(
   message: string,
   deploymentType: "agent_engine" | "local_backend"
 ): void {
-  const truncatedMessage =
-    message.length > 50 ? message.substring(0, 50) + "..." : message;
   console.log(
     `📨 Stream Request [${deploymentType}] - Session: ${sessionId}, User: ${userId}`
   );

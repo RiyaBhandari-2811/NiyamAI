@@ -99,7 +99,7 @@ const JiraAuth = () => {
     if (userId && !connected) {
       handleUserIdConfirm(userId);
     }
-  }, [userId, connected]);
+  }, [userId, connected, handleUserIdConfirm]);
 
   return (
     <>
@@ -110,8 +110,8 @@ const JiraAuth = () => {
           className={`relative flex items-center justify-center gap-2 w-fit min-w-[180px] h-11 rounded-xl font-medium transition-all duration-300 hover:cursor-pointer
             ${
               connected
-                ? "bg-linear-to-br` from-red-500 to-red-600 text-white hover:from-red-600 hover:to-red-700 shadow-md shadow-red-900/20"
-                : "bg-linear-to-br` from-emerald-500 to-emerald-600 text-white hover:from-emerald-600 hover:to-emerald-700 shadow-md shadow-emerald-900/20"
+                ? "bg-linear-to-br from-red-500 to-red-600 text-white hover:from-red-600 hover:to-red-700 shadow-md shadow-red-900/20"
+                : "bg-linear-to-br from-emerald-500 to-emerald-600 text-white hover:from-emerald-600 hover:to-emerald-700 shadow-md shadow-emerald-900/20"
             }
             ${loading || !userId ? "opacity-50 cursor-not-allowed" : ""}
           `}
@@ -189,15 +189,19 @@ const JiraAuth = () => {
               <p>Your OAuth tokens are:</p>
               <ul className="list-disc ml-5 space-y-1">
                 <li>
-                  Encrypted using AES-256 encryption before being stored in
+                  Encrypted using AES-256 encryption AES-256-CBC with a
+                  unique initialization vector (IV) before being stored in
                   Google Cloud Firestore.
                 </li>
-                <li>Decrypted only in memory during active Jira operations.</li>
-                <li>Permanently deleted upon disconnect.</li>
+                <li>Tokens are decrypted only in memory during authorized Jira
+                  operations and never written to disk.</li>
+                <li> All stored credentials are permanently deleted upon
+                  disconnection or account removal.</li>
               </ul>
               <p>
-                All services are hosted in Google Cloud (GCP) which is ISO/IEC
-                27001, SOC 2, and GDPR compliant.
+                Our infrastructure is fully hosted on Google Cloud Platform
+                (GCP), which complies with ISO/IEC 27001, SOC 2, and GDPR
+                standards for data protection and security.
               </p>
 
               <h3 className="text-foreground font-semibold mt-4">

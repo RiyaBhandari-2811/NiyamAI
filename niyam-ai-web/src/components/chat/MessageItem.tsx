@@ -44,6 +44,7 @@ export function MessageItem({
   try {
     messageContent = JSON.parse(message.content);
   } catch (e) {
+    console.error("Error: ", e);
     messageContent = message.content;
   }
 
