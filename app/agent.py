@@ -12,7 +12,7 @@ from app.tools.jira_functiontool_adaptor import ft
 
 # --- Configuration / constants (single place to change) ---
 MODEL_NAME = "gemini-2.0-flash"
-INCLUDE_THOUGHTS_FOR_DEBUG = True  # set True only for development
+INCLUDE_THOUGHTS_FOR_DEBUG = False  # set True only for development
 DEFAULT_PLANNER = BuiltInPlanner(
     thinking_config=genai_types.ThinkingConfig(include_thoughts=INCLUDE_THOUGHTS_FOR_DEBUG)
 )
