@@ -1,5 +1,5 @@
 import requests
-from tools.jira_token_manager import JiraTokenManager
+from ..tools.jira_token_manager import JiraTokenManager
 
 
 class JiraRestTool:
@@ -17,6 +17,8 @@ class JiraRestTool:
         self.ctx = self.manager.get_jira_context()
         print("[DEBUG] Jira context loaded successfully.")
         print(f"[DEBUG] Context keys: {list(self.ctx.keys())}")
+        self.__name__ = "jira_rest_tool"   # adding name so ADK can read it
+        self.__doc__ = "Jira REST API callable adapter"
 
         # Ensure headers have Bearer prefix
         access_token = self.ctx.get("access_token")
@@ -107,3 +109,35 @@ class JiraRestTool:
 
         print(f"[DEBUG] Issue {issue_key} fetched successfully.")
         return res.json()
+
+    def __call__(self, input_data):
+        """
+        Minimal callable interface. The LlmAgent will call this object.
+        Decide on input contract: string prompt, or dict with action+params.
+        Example expects input_data to be dict: {"action":"create_issue", ...}
+        """
+        # Simple dispatch by action
+        try:
+            if isinstance(input_data, str):
+                # default behaviour — treat string as "list_projects" request
+                return self.list_projects()
+            if not isinstance(input_data, dict):
+                raise ValueError("JiraRestTool expects dict or str input.")
+
+            action = input_data.get("action")
+            if action == "list_projects":
+                return self.list_projects()
+            if action == "create_issue":
+                return self.create_issue(
+                    project_key=input_data["project_key"],
+                    summary=input_data["summary"],
+                    description=input_data.get("description", ""),
+                    issue_type=input_data.get("issue_type", "Task"),
+                )
+            if action == "get_issue":
+                return self.get_issue(input_data["issue_key"])
+
+            raise ValueError(f"Unknown action: {action}")
+        except Exception as e:
+            # Return an error string/object the agent can consume
+            return {"error": str(e)}

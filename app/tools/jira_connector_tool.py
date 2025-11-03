@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 from google.adk.tools.application_integration_tool.application_integration_toolset import (
     ApplicationIntegrationToolset,
 )
-from tools.jira_token_manager import JiraTokenManager
+from ..tools.jira_token_manager import JiraTokenManager
 import json
 import requests
 from google.auth.transport.requests import Request

@@ -2,10 +2,15 @@ import requests
 import time
 import os
 from dotenv import load_dotenv
-from tools.firestore_decrypt_tool import FirestoreDecryptTool
+from ..tools.firestore_decrypt_tool import FirestoreDecryptTool
 
 # Load .env from root/app/.env
 load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env"))
+
+project_id = os.getenv("GOOGLE_CLOUD_PROJECT")
+database_id = os.getenv("GCP_FIRESTORE_DB")
+collection_name = "users"
+
 
 class JiraTokenManager:
     def __init__(self, collection="users", doc_id=None):
