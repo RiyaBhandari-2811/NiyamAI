@@ -1,17 +1,18 @@
 from google.adk.agents import SequentialAgent, LlmAgent
 import google.genai.types as genai_types
 from google.adk.planners import BuiltInPlanner
+import os
 from .prompts import (
     requirement_normalizer_instruction,
     testcase_generator_agent_instruction,
     validation_agent_instruction,
 )
-from app.tools import connector_tool
+from app.tools.jira_functiontool_adaptor import ft
 
 
 # --- Configuration / constants (single place to change) ---
 MODEL_NAME = "gemini-2.0-flash"
-INCLUDE_THOUGHTS_FOR_DEBUG = True  # set True only for development
+INCLUDE_THOUGHTS_FOR_DEBUG = False  # set True only for development
 DEFAULT_PLANNER = BuiltInPlanner(
     thinking_config=genai_types.ThinkingConfig(include_thoughts=INCLUDE_THOUGHTS_FOR_DEBUG)
 )
@@ -25,7 +26,7 @@ requirement_normalizer_agent = LlmAgent(
     model=MODEL_NAME,
     instruction=requirement_normalizer_instruction,
     planner=DEFAULT_PLANNER,
-    tools=[connector_tool],
+    # tools=[ft], # Should we enable any tools here?
     output_key="normalized_requirements"
 )
 
@@ -46,10 +47,9 @@ validation_agent = LlmAgent(
     model=MODEL_NAME,
     instruction=validation_agent_instruction,
     planner=DEFAULT_PLANNER,
-    tools=[connector_tool],
+    tools=[ft],
     output_key="validated_test_cases"
 )
-
 
 
 # ---SequentialAgent ---

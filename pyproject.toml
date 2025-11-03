@@ -9,6 +9,7 @@ authors = [
 dependencies = [
     "google-adk==1.6.1",
     "google-cloud-firestore>=2.21.0",
+    "google-genai>=1.46.0",
     "pycryptodome>=3.23.0",
     "python-dotenv",
 ]
