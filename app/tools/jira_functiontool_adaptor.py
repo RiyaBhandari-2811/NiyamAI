@@ -6,8 +6,8 @@ import logging
 
 # Import only classes / functions — do NOT instantiate them at import time.
 from app.tools.jira_rest_tool import JiraRestTool
-from app.tools.get_firestore_doc_id import get_firestore_doc_id
 from google.adk.tools.function_tool import FunctionTool
+from google.adk.tools.tool_context import ToolContext
 
 logger = logging.getLogger(__name__)
 
@@ -16,7 +16,7 @@ _jira_helper: Optional[JiraRestTool] = None
 _jira_helper_error: Optional[Exception] = None
 
 
-def _get_jira_helper() -> JiraRestTool:
+def _get_jira_helper(user_id: str) -> JiraRestTool:
     """
     Lazily instantiate JiraRestTool the first time it's needed.
 
@@ -32,30 +32,10 @@ def _get_jira_helper() -> JiraRestTool:
         raise _jira_helper_error
 
     try:
-        collection = os.getenv("JIRA_TOKEN_COLLECTION", "users")
-        # Allow explicit override of doc_id via env var for convenience
-        env_doc_id = os.getenv("JIRA_TOKEN_DOC_ID")
-
-        if env_doc_id:
-            doc_id = env_doc_id
-            logger.debug("Using JIRA_TOKEN_DOC_ID from env: %s", doc_id)
-        else:
-            # Try to compute doc id via helper (if available)
-            project_id = os.getenv("GOOGLE_CLOUD_PROJECT")
-            database_id = os.getenv("GCP_FIRESTORE_DB")
-            logger.debug("Attempting get_firestore_doc_id with project=%s db=%s collection=%s",
-                         project_id, database_id, collection)
-            doc_id = get_firestore_doc_id(project_id=project_id, database_id=database_id, collection_name=collection)
-
-        if not doc_id:
-            raise RuntimeError(
-                "Firestore doc id for Jira tokens not found. "
-                "Set JIRA_TOKEN_DOC_ID env var or ensure get_firestore_doc_id can resolve it."
-            )
 
         # Instantiate JiraRestTool (this will perform Firestore IO)
-        logger.info("Instantiating JiraRestTool with collection=%s doc_id=%s", collection, doc_id)
-        _jira_helper = JiraRestTool(collection=collection, doc_id=doc_id)
+        logger.info("Instantiating JiraRestTool with collection=%s doc_id=%s", "users", user_id)
+        _jira_helper = JiraRestTool(collection="users", doc_id=user_id)
         return _jira_helper
 
     except Exception as e:
@@ -66,6 +46,7 @@ def _get_jira_helper() -> JiraRestTool:
 
 
 def jira_rest_tool(
+    tool_context: ToolContext,
     action: str,
     project_key: Optional[str] = None,
     summary: Optional[str] = None,
@@ -79,8 +60,12 @@ def jira_rest_tool(
     action: 'list_projects' | 'create_issue' | 'get_issue'
     Returns a JSON-serializable dict. If helper is not available, returns an error dict.
     """
+    invocation_context = tool_context._invocation_context
+
+    user_id = invocation_context.user_id or "unknown_user"
+
     try:
-        jira = _get_jira_helper()
+        jira = _get_jira_helper(user_id=user_id)
     except Exception as e:
         # Return structured error rather than letting import-time or runtime exceptions bubble up
         logger.error("Jira helper not available when calling jira_rest_tool: %s", e)
