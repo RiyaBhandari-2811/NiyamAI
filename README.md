@@ -45,4 +45,4 @@ A walkthrough of NiyamAI in action is available [here](https://drive.google.com/
 
 ## Contribution
 
-We welcome contributions! Please check out our [Contribution Guide](./CONTRIBUTION.md) to get started.
+We welcome contributions! Please check out our [Contribution Guide](./contribution.md) to get started.
