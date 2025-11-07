@@ -1,4 +1,3 @@
-# file: app/tools/jira_function_tool_adapter.py
 from typing import Optional
 import inspect
 import os

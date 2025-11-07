@@ -1,5 +1,5 @@
 import requests
-from ..tools.jira_token_manager import JiraTokenManager
+from app.tools.jira_token_manager import JiraTokenManager
 
 
 class JiraRestTool:

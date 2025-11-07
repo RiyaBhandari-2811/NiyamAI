@@ -2,7 +2,7 @@ from google.adk.agents import SequentialAgent, LlmAgent
 import google.genai.types as genai_types
 from google.adk.planners import BuiltInPlanner
 import os
-from .prompts import (
+from app.prompts import (
     requirement_normalizer_instruction,
     testcase_generator_agent_instruction,
     validation_agent_instruction,

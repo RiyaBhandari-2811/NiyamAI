@@ -3,8 +3,8 @@ import json
 import os
 import base64
 from google.cloud import secretmanager
-from ..services.crypto import decrypt_object
-from ..services.firestore_client import get_firestore_client
+from app.services.crypto import decrypt_object
+from app.services.firestore_client import get_firestore_client
 from google.oauth2 import service_account
 from dotenv import load_dotenv
 

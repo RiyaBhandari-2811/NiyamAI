@@ -58,3 +58,5 @@ opentelemetry-semantic-conventions==0.59b0
 packaging==25.0
 proto-plus==1.26.1
 protobuf==6.33
+pydantic==2.12.3
+pycryptodome==3.23.0
