@@ -18,16 +18,23 @@ class FirestoreDecryptTool:
     creds_json = os.getenv("GOOGLE_CLOUD_APPLICATION_CREDENTIALS_JSON")
     print("DEBUG: creds_json loaded:", bool(creds_json))
 
-    # creds_json = os.getenv("GOOGLE_CLOUD_APPLICATION_CREDENTIALS_JSON")
+    if not creds_json:
+        raise ValueError(
+            "Missing GOOGLE_CLOUD_APPLICATION_CREDENTIALS_JSON in environment."
+        )
+
+    creds_json = creds_json.strip()
     creds_dict = json.loads(creds_json)
     credentials = service_account.Credentials.from_service_account_info(creds_dict)
 
-    def __init__(self, project_id=None, secret_name="AES256_KEY", credentials=None):
-        self.project = project_id or os.getenv("GOOGLE_CLOUD_PROJECT")
-        print("DEBUG: Using GOOGLE_CLOUD_PROJECT project:", self.project)
-        self.secret_name = secret_name
-        creds = credentials or self.credentials
-        self._sm_client = secretmanager.SecretManagerServiceClient(credentials=creds)
+    project =  os.getenv("GOOGLE_CLOUD_PROJECT")
+    secret_name =  os.getenv("GOOGLE_CLOUD_AES_KEY")
+
+    print("DEBUG: Using GOOGLE_CLOUD_PROJECT project:", project)
+    print("DEBUG: Using secret name:", secret_name)
+
+    def __init__(self, credentials=None):
+        self._sm_client = secretmanager.SecretManagerServiceClient(credentials=credentials)
         self._fs_client = get_firestore_client()
 
     def _get_key_bytes(self):
