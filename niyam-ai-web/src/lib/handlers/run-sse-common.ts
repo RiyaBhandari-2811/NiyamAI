@@ -175,91 +175,89 @@ export function validateStreamRequest(requestBody: {
 export function formatAgentEnginePayload(
   requestData: ProcessedStreamRequest
 ): AgentEnginePayload {
-  let messagePayload: any = {};
+  const safeStringify = (data: any): string => {
+    try {
+      return JSON.stringify(data, null, 2);
+    } catch {
+      return String(data);
+    }
+  };
+
+  let messageText = "";
 
   try {
-    const payload = JSON.parse(requestData.message || "{}");
+    let baseMessage: any = requestData.message;
 
-    if (payload.type === "text") {
-      messagePayload = { parts: [{ text: String(payload.data) }] };
-    } else if (payload.type === "file") {
-      messagePayload = {
-        parts: [
-          {
-            text: JSON.stringify({
-              type: "file",
-              mimeType: payload.mime,
-              data: payload.data,
-            }),
-          },
-        ],
-      };
-    } else if (payload.type === "url") {
-      messagePayload = { parts: [{ text: payload.data }] };
+    // Normalize input format
+    if (Array.isArray(baseMessage)) {
+      console.log("📋 [Agent] Message is array, extracting text field");
+      baseMessage = baseMessage[0]?.text || "";
+    } else if (typeof baseMessage === "object" && baseMessage.text) {
+      console.log("📋 [Agent] Message is object with text field");
+      baseMessage = baseMessage.text;
     }
-  } catch (e) {
-    // fallback for plain text
-    console.error(" Error: ", e);
-    messagePayload = { parts: [{ text: requestData.message }] };
+
+    // Try parsing stringified JSON
+    let payload: any;
+    if (typeof baseMessage === "string") {
+      try {
+        payload = JSON.parse(baseMessage);
+      } catch {
+        payload = { type: "text", content: baseMessage };
+      }
+    } else {
+      payload = baseMessage;
+    }
+
+    console.group("[formatAgentEnginePayload] Parsed Payload");
+    console.log("✅ Parsed payload:", safeStringify(payload));
+    console.groupEnd();
+
+    // Normalize to a clean string
+    switch (payload.type) {
+      case "text":
+      case "url":
+        messageText =
+          typeof payload.content === "string"
+            ? payload.content.trim()
+            : safeStringify(payload).trim();
+        break;
+
+      case "file":
+        messageText = safeStringify({
+          type: "file",
+          mimeType: payload.mime,
+          filename: payload.filename || "file.pdf",
+          data: payload.data,
+        }).trim();
+        break;
+
+      default:
+        messageText = safeStringify(payload).trim();
+        break;
+    }
+  } catch (err) {
+    console.error("❌ [Agent] Failed to process message:", err);
+    messageText = String(requestData.message).trim();
   }
 
-  return {
+  const finalPayload: AgentEnginePayload = {
     class_method: "stream_query",
     input: {
       user_id: requestData.userId,
       session_id: requestData.sessionId,
-      message: messagePayload,
+      message: messageText,
     },
   };
+
+  console.group("[formatAgentEnginePayload] Final Payload");
+  console.log("🧾 message:", messageText);
+  console.log("🚀 full payload:", safeStringify(finalPayload));
+  console.groupEnd();
+
+  return finalPayload;
 }
 
-/**
- * Format local backend payload
- *
- * @param requestData - Processed request data
- * @returns Local backend formatted payload
- */
-// export function formatLocalBackendPayload(
-//   requestData: ProcessedStreamRequest
-// ): any {
-//   let parts: any = [];
-
-//   try {
-//     const payload = JSON.parse(requestData.message || "{}");
-
-//     if (payload.type === "text") {
-//       parts = [{ text: String(payload.data) }];
-//     } else if (payload.type === "file") {
-//       console.log("File Type detected");
-
-//       parts = [
-//         {
-//           text: JSON.stringify({
-//             type: "file",
-//             mimeType: payload.mime,
-//             data: payload.data,
-//           }),
-//         },
-//       ];
-//     } else if (payload.type === "url") {
-//       parts = [{ text: payload.data }];
-//     }
-//   } catch (e) {
-//     // fallback in case message is just plain text
-//     parts = [{ text: requestData.message }];
-//   }
-
-//   return {
-//     appName: getAdkAppName(),
-//     userId: requestData.userId,
-//     sessionId: requestData.sessionId,
-//     newMessage: {
-//       parts,
-//       role: "user",
-//     },
-//     streaming: true,
-//   };
-// }
 
 export function formatLocalBackendPayload(
   requestData: ProcessedStreamRequest
