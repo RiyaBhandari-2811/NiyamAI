@@ -3,10 +3,10 @@ import { Firestore } from "@google-cloud/firestore";
 let firestore: Firestore;
 
 try {
-  const credsJson = process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON;
+  const credsJson = process.env.GOOGLE_CLOUD_APPLICATION_CREDENTIALS_JSON;
 
   if (!credsJson) {
-    throw new Error("Missing GOOGLE_APPLICATION_CREDENTIALS_JSON in environment");
+    throw new Error("Missing GOOGLE_CLOUD_APPLICATION_CREDENTIALS_JSON in environment");
   }
 
   const credentials = JSON.parse(credsJson);

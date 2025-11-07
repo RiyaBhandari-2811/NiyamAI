@@ -7,19 +7,23 @@ from google.oauth2 import service_account
 def get_firestore_client():
     """
     Returns a Firestore client using a full service account JSON
-    stored as an environment variable (GOOGLE_APPLICATION_CREDENTIALS_JSON).
+    stored as an environment variable (GOOGLE_CLOUD_APPLICATION_CREDENTIALS_JSON).
     This mirrors Node.js behavior with a single JSON env.
     """
-    creds_json = os.getenv("GOOGLE_APPLICATION_CREDENTIALS_JSON")
+    creds_json = os.getenv("GOOGLE_CLOUD_APPLICATION_CREDENTIALS_JSON")
 
     if not creds_json:
-        raise ValueError("Missing GOOGLE_APPLICATION_CREDENTIALS_JSON in environment.")
+        raise ValueError(
+            "Missing GOOGLE_CLOUD_APPLICATION_CREDENTIALS_JSON in environment."
+        )
 
     # Parse the JSON string into a dictionary
     try:
         credentials_dict = json.loads(creds_json)
     except json.JSONDecodeError:
-        raise ValueError("Invalid JSON format in GOOGLE_APPLICATION_CREDENTIALS_JSON.")
+        raise ValueError(
+            "Invalid JSON format in GOOGLE_CLOUD_APPLICATION_CREDENTIALS_JSON."
+        )
 
     creds = service_account.Credentials.from_service_account_info(credentials_dict)
 
