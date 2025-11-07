@@ -3,21 +3,15 @@ import { Firestore } from "@google-cloud/firestore";
 let firestore: Firestore;
 
 try {
-  const credsJson = process.env.GOOGLE_CLOUD_APPLICATION_CREDENTIALS_JSON;
-
-  if (!credsJson) {
-    throw new Error("Missing GOOGLE_CLOUD_APPLICATION_CREDENTIALS_JSON in environment");
-  }
-
-  const credentials = JSON.parse(credsJson);
-
   firestore = new Firestore({
-    projectId: credentials.project_id,
+    projectId: process.env.GOOGLE_CLOUD_PROJECT,
     credentials: {
-      client_email: credentials.client_email,
-      private_key: credentials.private_key,
+      client_email: process.env.GOOGLE_CLOUD_CLIENT_EMAIL,
+      private_key: process.env.GOOGLE_CLOUD_PRIVATE_KEY?.replace(/\\n/g, "\n")
+        .replace(/\r/g, "")
+        .trim(),
     },
-    databaseId: process.env.GOOGLE_CLOUD_FIRESTORE_DB || "(default)",
+    databaseId: process.env.GOOGLE_CLOUD_FIRESTORE_DB,
   });
 
   console.log("[firebaseAdmin] Firestore initialized successfully");
