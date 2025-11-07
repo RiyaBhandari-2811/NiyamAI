@@ -6,9 +6,7 @@ import { SessionSelector } from "./SessionSelector";
 import JiraProjectList from "./JiraProjectList";
 
 /**
- * ChatHeader - User and session management interface
- * Extracted from ChatMessagesView header section
- * Handles user ID input and session selection
+ * ChatHeader - Clean, responsive header with no overlapping
  */
 const ChatHeader = () => {
   const {
@@ -20,51 +18,68 @@ const ChatHeader = () => {
   } = useChatContext();
 
   return (
-    <div className="relative z-10 shrink-0 border-b border-border bg-background/80 backdrop-blur-sm">
-      <div className="flex justify-between items-center p-6">
-        {/* Left side - App branding */}
-        <div className="flex items-center gap-3">
+    <header className="relative z-10 shrink-0 border-b border-border bg-background/80 backdrop-blur-sm">
+      <div className="flex flex-wrap justify-between items-center gap-4 px-6 py-4">
+        {/* Left side - Branding */}
+        <div className="flex items-center gap-3 min-w-[180px]">
           <div className="w-8 h-8 bg-linear-to-br from-[hsl(142_76%_45%)] to-[hsl(142_76%_35%)] rounded-full flex items-center justify-center shadow-md">
             <Bot className="h-4 w-4 text-[hsl(220_25%_10%)]" />
           </div>
-          <div>
-            <h1 className="text-lg font-semibold text-foreground">Niyam AI</h1>
+          <div className="truncate">
+            <h1 className="text-lg font-semibold text-foreground truncate">
+              Niyam AI
+            </h1>
             <p className="text-xs text-muted-foreground">
               Powered by Google Gemini
             </p>
           </div>
         </div>
 
-        {/* Right side - User + Session controls */}
-        <div className="flex justify-evenly items-center gap-4">
+        {/* Right side - Controls */}
+        <div className="flex flex-wrap items-center justify-end gap-3 sm:gap-4 flex-1 min-w-0">
           {userId && connected && (
             <>
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-muted-foreground">User:</span>
-                <Badge
-                  variant="secondary"
-                  className="px-3 py-1 font-semibold text-sm tracking-tight bg-muted text-foreground border border-border hover:bg-muted/80 transition-colors duration-200"
-                >
-                  {userId || "Unknown"}
-                </Badge>
+              {/* User ID */}
+              <div className="flex items-center gap-2 min-w-[200px] max-w-[350px]">
+                <span className="text-sm text-muted-foreground shrink-0">
+                  User:
+                </span>
+                <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-slate-600 scrollbar-track-transparent rounded-full max-w-[280px]">
+                  <Badge
+                    variant="secondary"
+                    className="whitespace-nowrap px-3 py-1 font-medium bg-muted text-foreground border border-border w-max"
+                    title={userId}
+                  >
+                    {userId}
+                  </Badge>
+                </div>
               </div>
 
-              <SessionSelector
-                currentUserId={userId}
-                currentSessionId={sessionId}
-                onSessionSelect={handleSessionSwitch}
-                onCreateSession={handleCreateNewSession}
-                className="text-xs text-foreground"
-              />
+              {/* Session Selector */}
+              <div className="flex-shrink-0">
+                <SessionSelector
+                  currentUserId={userId}
+                  currentSessionId={sessionId}
+                  onSessionSelect={handleSessionSwitch}
+                  onCreateSession={handleCreateNewSession}
+                  className="text-xs text-foreground"
+                />
+              </div>
 
-              <JiraProjectList />
+              {/* Project List */}
+              <div className="flex-shrink-0">
+                <JiraProjectList />
+              </div>
             </>
           )}
 
-          <JiraAuth />
+          {/* Jira Auth Button */}
+          <div className="flex-shrink-0">
+            <JiraAuth />
+          </div>
         </div>
       </div>
-    </div>
+    </header>
   );
 };
 

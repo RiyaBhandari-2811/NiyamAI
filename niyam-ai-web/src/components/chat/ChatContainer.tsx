@@ -13,32 +13,36 @@ import Footer from "../footer/Footer";
  */
 export function ChatContainer(): React.JSX.Element {
   return (
-    <div className="min-h-screen flex flex-col bg-background text-foreground relative">
+    <div className="min-h-screen flex flex-col bg-background text-foreground relative overflow-hidden">
       <BackendHealthChecker>
-        {/* Background */}
-        <div className="absolute bg-slate-950/40 pointer-events-none"></div>
+        {/* Background Overlay */}
+        <div className="absolute inset-0 bg-slate-950/40 pointer-events-none -z-10"></div>
 
         {/* Sticky Header */}
-        <div className="sticky top-0 z-20 bg-slate-950/40 border-b border-border">
+        <header className="sticky top-0 z-20 bg-slate-950/60 border-b border-border backdrop-blur-sm">
           <ChatHeader />
-        </div>
+        </header>
 
-        {/* Center ChatContent vertically and horizontally */}
-        <div className="relative z-10 flex flex-col grow  bg-slate-950/40">
-          <div className="grow">
+        {/* Unified scroll area for content + input + footer */}
+        <main className="flex-1 overflow-y-auto bg-slate-950/30 px-4 py-4 space-y-8">
+          {/* Chat messages */}
+          <section id="chat-section">
             <ChatContent />
-          </div>
+          </section>
 
-          {/* Chat Input at bottom */}
-          <div className="shrink-0 bg-slate-950/40">
+          {/* Chat input area */}
+          <section id="input-section">
             <ChatInput />
-          </div>
-        </div>
+          </section>
 
-        {/* Footer */}
-        <div className="relative z-10 bg-popover border-t border-border">
-          <Footer />
-        </div>
+          {/* Footer (e.g. tips, metadata, status) */}
+          <footer
+            id="footer-section"
+            className="border-t border-border bg-popover"
+          >
+            <Footer />
+          </footer>
+        </main>
       </BackendHealthChecker>
     </div>
   );
