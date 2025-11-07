@@ -139,7 +139,7 @@ def deploy_agent_engine_app() -> agent_engines.AgentEngine:
     agent_config = {
         "agent_engine": agent_engine,
         "display_name": deployment_config.agent_name,
-        "description": "A simple goal planning agent",
+        "description": "Your AI-Powered Healthcare Test Case Generator.",
         "extra_packages": deployment_config.extra_packages,
         "env_vars": env_vars,
         "requirements": requirements,

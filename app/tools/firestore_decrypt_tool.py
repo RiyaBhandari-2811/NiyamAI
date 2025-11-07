@@ -36,6 +36,11 @@ class FirestoreDecryptTool:
     def __init__(self, credentials=None):
         self._sm_client = secretmanager.SecretManagerServiceClient(credentials=credentials)
         self._fs_client = get_firestore_client()
+    
+    def update_tokens(self, collection, doc_id, data):
+        from google.cloud import firestore
+        db = firestore.Client()
+        db.collection(collection).document(doc_id).update(data)
 
     def _get_key_bytes(self):
         name = f"projects/{self.project}/secrets/{self.secret_name}/versions/latest"
