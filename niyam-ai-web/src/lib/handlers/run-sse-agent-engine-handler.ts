@@ -277,14 +277,24 @@ class JSONFragmentProcessor {
     // Try to parse any remaining buffer content
     if (this.buffer.trim()) {
       try {
-        const fragment: AgentEngineFragment = JSON.parse(this.buffer);
-        this.processCompleteFragment(fragment);
-      } catch (error) {
-        console.error(
-          "❌ [JSON PROCESSOR] Failed to parse remaining buffer on finalize:",
-          this.buffer,
-          error
-        );
+        const fragments = this.buffer
+          .split(/(?<=\})\s*(?=\{)/g) // split when one JSON ends and next begins
+          .filter((f) => f.trim().length > 0);
+
+        for (const frag of fragments) {
+          try {
+            const parsed = JSON.parse(frag);
+            this.processCompleteFragment(parsed);
+          } catch (err) {
+            console.error(
+              "❌ [JSON PROCESSOR] Failed to parse fragment:",
+              frag.slice(0, 200),
+              err
+            );
+          }
+        }
+      } catch (err) {
+        console.error("❌ [JSON PROCESSOR] Finalization failed:", err);
       }
     }
   }
