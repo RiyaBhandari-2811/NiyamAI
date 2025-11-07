@@ -6,12 +6,12 @@ try {
   firestore = new Firestore({
     projectId: process.env.GOOGLE_CLOUD_PROJECT,
     credentials: {
-      client_email: process.env.GCP_CLIENT_EMAIL,
-      private_key: process.env.GCP_PRIVATE_KEY?.replace(/\\n/g, "\n")
+      client_email: process.env.GOOGLE_CLOUD_CLIENT_EMAIL,
+      private_key: process.env.GOOGLE_CLOUD_PRIVATE_KEY?.replace(/\\n/g, "\n")
         .replace(/\r/g, "")
         .trim(),
     },
-    databaseId: process.env.GCP_FIRESTORE_DB,
+    databaseId: process.env.GOOGLE_CLOUD_FIRESTORE_DB,
   });
 
   console.log("[firebaseAdmin] Firestore initialized successfully");

@@ -20,7 +20,7 @@ class JiraConnectorTool:
 
     def _get_google_access_token(self):
         creds = service_account.Credentials.from_service_account_info(
-            json.loads(os.getenv("GOOGLE_APPLICATION_CREDENTIALS_JSON"))
+            json.loads(os.getenv("GOOGLE_CLOUD_APPLICATION_CREDENTIALS_JSON"))
         )
         creds = creds.with_scopes(["https://www.googleapis.com/auth/cloud-platform"])
         creds.refresh(Request())

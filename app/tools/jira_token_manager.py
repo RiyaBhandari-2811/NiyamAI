@@ -8,7 +8,7 @@ from ..tools.firestore_decrypt_tool import FirestoreDecryptTool
 load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env"))
 
 project_id = os.getenv("GOOGLE_CLOUD_PROJECT")
-database_id = os.getenv("GCP_FIRESTORE_DB")
+database_id = os.getenv("GOOGLE_CLOUD_FIRESTORE_DB")
 collection_name = "users"
 
 
@@ -37,7 +37,7 @@ class JiraTokenManager:
         print("[DEBUG] Decrypted keys fetched:", list(decrypted_data.keys()))
         self.access_token = decrypted_data.get("accessToken")
         self.refresh_token = decrypted_data.get("refreshToken")
-        self.cloud_id = decrypted_data.get("cloudId") 
+        self.cloud_id = decrypted_data.get("cloudId")
         self.scope = decrypted_data.get("scope")
 
         # Load secrets from env

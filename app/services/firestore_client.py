@@ -4,14 +4,15 @@ import json
 from google.cloud import firestore
 from google.oauth2 import service_account
 
+
 def get_firestore_client():
     """
     Returns a Firestore client using explicit service account credentials.
     Mirrors your Node.js setup exactly.
     """
     project_id = os.getenv("GOOGLE_CLOUD_PROJECT")
-    client_email = os.getenv("GCP_CLIENT_EMAIL")
-    private_key = os.getenv("GCP_PRIVATE_KEY")
+    client_email = os.getenv("GOOGLE_CLOUD_CLIENT_EMAIL")
+    private_key = os.getenv("GOOGLE_CLOUD_PRIVATE_KEY")
 
     if not all([project_id, client_email, private_key]):
         raise ValueError("Missing one or more Firestore environment variables.")
@@ -33,4 +34,8 @@ def get_firestore_client():
     creds = service_account.Credentials.from_service_account_info(credentials_dict)
 
     # Important: specify databaseId to match Node
-    return firestore.Client(project=project_id, database=os.getenv("GCP_FIRESTORE_DB", "(default)"), credentials=creds)
+    return firestore.Client(
+        project=project_id,
+        database=os.getenv("GOOGLE_CLOUD_FIRESTORE_DB", "(default)"),
+        credentials=creds,
+    )

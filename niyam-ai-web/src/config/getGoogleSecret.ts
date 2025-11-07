@@ -1,21 +1,19 @@
 import { SecretManagerServiceClient } from "@google-cloud/secret-manager";
 
-if (!process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON) {
+if (!process.env.GOOGLE_CLOUD_APPLICATION_CREDENTIALS_JSON) {
   throw new Error(
-    "Missing GOOGLE_APPLICATION_CREDENTIALS_JSON environment variable"
+    "Missing GOOGLE_CLOUD_APPLICATION_CREDENTIALS_JSON environment variable"
   );
 }
 
-const jsonString = process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON.replace(
-  /\n/g,
-  "\\n"
-);
+const jsonString =
+  process.env.GOOGLE_CLOUD_APPLICATION_CREDENTIALS_JSON.replace(/\n/g, "\\n");
 const credentials = JSON.parse(jsonString);
 const client = new SecretManagerServiceClient({ credentials });
 
 export async function getAesKey() {
   const [version] = await client.accessSecretVersion({
-    name: `projects/${process.env.GOOGLE_CLOUD_PROJECT}/secrets/AES256_KEY/versions/latest`,
+    name: `projects/${process.env.GOOGLE_CLOUD_PROJECT}/secrets/${process.env.GOOGLE_CLOUD_AES_KEY}/versions/latest`,
   });
 
   const data = version?.payload?.data;

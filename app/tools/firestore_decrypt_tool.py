@@ -3,20 +3,22 @@ import json
 import os
 import base64
 from google.cloud import secretmanager
-from ..services.crypto import decrypt_object 
+from ..services.crypto import decrypt_object
 from ..services.firestore_client import get_firestore_client
 from google.oauth2 import service_account
 from dotenv import load_dotenv
+
 load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env"))
+
 
 class FirestoreDecryptTool:
     name = "FirestoreDecryptTool"
     description = "Fetches encrypted doc from Firestore and decrypts using AES-256-CBC key from Secret Manager"
 
-    creds_json = os.getenv("GOOGLE_APPLICATION_CREDENTIALS_JSON")
-    print("DEBUG: creds_json loaded:", bool(creds_json)) 
-    
-    # creds_json = os.getenv("GOOGLE_APPLICATION_CREDENTIALS_JSON")
+    creds_json = os.getenv("GOOGLE_CLOUD_APPLICATION_CREDENTIALS_JSON")
+    print("DEBUG: creds_json loaded:", bool(creds_json))
+
+    # creds_json = os.getenv("GOOGLE_CLOUD_APPLICATION_CREDENTIALS_JSON")
     creds_dict = json.loads(creds_json)
     credentials = service_account.Credentials.from_service_account_info(creds_dict)
 
@@ -26,7 +28,7 @@ class FirestoreDecryptTool:
         self.secret_name = secret_name
         creds = credentials or self.credentials
         self._sm_client = secretmanager.SecretManagerServiceClient(credentials=creds)
-        self._fs_client = get_firestore_client()  
+        self._fs_client = get_firestore_client()
 
     def _get_key_bytes(self):
         name = f"projects/{self.project}/secrets/{self.secret_name}/versions/latest"
@@ -65,4 +67,3 @@ class FirestoreDecryptTool:
             print(f"DEBUG: decrypt_object returned type={type(decrypted).__name__}")
         print(json.dumps(decrypted, indent=2))
         return decrypt_object(encrypted_b64, iv_b64, key)
-    
