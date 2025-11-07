@@ -1,14 +1,25 @@
 import { SecretManagerServiceClient } from "@google-cloud/secret-manager";
 
-if (!process.env.GOOGLE_CLOUD_APPLICATION_CREDENTIALS_JSON) {
-  throw new Error(
-    "Missing GOOGLE_CLOUD_APPLICATION_CREDENTIALS_JSON environment variable"
-  );
+let credsRaw = process.env.GOOGLE_CLOUD_APPLICATION_CREDENTIALS_JSON;
+if (!credsRaw)
+  throw new Error("Missing GOOGLE_CLOUD_APPLICATION_CREDENTIALS_JSON");
+
+// Remove any trailing junk (like extra quotes or newlines)
+credsRaw = credsRaw.trim();
+
+// Sometimes Vercel adds an extra literal \n at the end, so clean it
+if (credsRaw.endsWith("\\n") || credsRaw.endsWith('"')) {
+  credsRaw = credsRaw.replace(/\\n"$/, "").replace(/"$/, "");
 }
 
-const jsonString =
-  process.env.GOOGLE_CLOUD_APPLICATION_CREDENTIALS_JSON.replace(/\n/g, "\\n");
-const credentials = JSON.parse(jsonString);
+// Now normalize the JSON for parsing
+const normalizedJson = credsRaw
+  .replace(/\n/g, "\\n") // turn real newlines into literal '\n'
+  .replace(/\r/g, ""); // drop carriage returns
+
+// Try parsing
+const credentials = JSON.parse(normalizedJson);
+
 const client = new SecretManagerServiceClient({ credentials });
 
 export async function getAesKey() {
